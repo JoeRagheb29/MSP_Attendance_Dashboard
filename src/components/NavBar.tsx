@@ -1,5 +1,5 @@
 import { FiPlus } from 'react-icons/fi'
-// import logo from '../assets/logo.jpg'
+import logo from '../assets/logo.jpg'
 
 interface NavBarProps {
   handleAddClick: () => void
@@ -8,12 +8,12 @@ interface NavBarProps {
 function NavBar({ handleAddClick }: NavBarProps) {
   return (
     <div>
-      <header className="bg-linear-to-r from-black to-purple-600 text-white shadow-xl">
-      {/* <header className="bg-linear-to-r from-black to-indigo-600 text-white shadow-xl"> */}
+      {/* <header className="bg-linear-to-r from-black to-purple-600 text-white shadow-xl"> */}
+      <header className="bg-linear-to-r from-black to-indigo-600 text-white shadow-xl">
         <div className="max-w-6xl mx-auto px-2 sm:px-4 lg:px-6 py-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
             <div className="flex-1 flex items-center gap-4">
-              {/* <img src={logo} alt="MSP Logo" className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg shadow-lg" /> */}
+              <img src={logo} alt="MSP Logo" className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg shadow-lg" />
               <div>
                 <h1 className="text-4xl font-bold tracking-tight mb-2">MSP Attendance System</h1>
                 <p className="text-indigo-100 text-lg">MSP Dashboard Workshop Management System</p>
