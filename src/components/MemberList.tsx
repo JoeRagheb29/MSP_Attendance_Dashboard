@@ -52,7 +52,8 @@ export const MemberList = ({
               <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Category</th>
               <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Email</th>
               <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Phone</th>
-              {/* <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th> */}
+              <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
+              <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Mark/Unmark</th>
               <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
@@ -74,7 +75,7 @@ export const MemberList = ({
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-600">{member.email || '—'}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{member.phone || '—'}</td>
-                {/*<td className="px-6 py-4">
+                <td className="px-6 py-4">
                    {member.attendanceToday ? (
                     <div className="flex items-center gap-2">
                       <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold gap-1.5 ${
@@ -96,23 +97,27 @@ export const MemberList = ({
                       Not Marked
                     </span>
                   )} 
-                </td>*/}
+                </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                  {/*   <button
+                    <button
                       onClick={() => onMarkAttendance(member.id, 'present')}
                       className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-xs font-semibold shadow-sm hover:shadow-md"
                       title="Mark as present"
-                    >
+                      >
                       <FiCheck size={14} /> Present
                     </button>
                     <button
                       onClick={() => onMarkAttendance(member.id, 'absent')}
                       className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-xs font-semibold shadow-sm hover:shadow-md"
                       title="Mark as absent"
-                    >
+                      >
                       <FiX size={14} /> Absent
-                    </button> */}
+                    </button>
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     <button
                       onClick={() => onEdit(member)}
                       className="inline-flex items-center justify-center gap-1 px-2.5 py-1.5 border-2 border-blue-500 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors text-xs font-semibold"
