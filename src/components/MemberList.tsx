@@ -11,16 +11,10 @@ interface MemberListProps {
 }
 
 export const MemberList = ({
-  members,
-  selectedCategory,
-  onDelete,
-  onEdit,
-  onMarkAttendance,
+  members, selectedCategory, onDelete, onEdit, onMarkAttendance,
 }: MemberListProps) => {
   const filteredMembers =
-    selectedCategory === 'all'
-      ? members
-      : members.filter((m: Member) => m.category === selectedCategory)
+    selectedCategory === 'all' ? members : members.filter((m: Member) => m.category === selectedCategory)
 
   if (filteredMembers.length === 0) {
     return (
@@ -65,12 +59,14 @@ export const MemberList = ({
                 <td className="px-6 py-4 text-sm font-semibold text-gray-600">{index + 1}</td>
                 <td className="px-6 py-4 text-sm font-bold text-gray-900">{member.name}</td>
                 <td className="px-6 py-4 text-sm">
-                  <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold gap-1 ${
+                  <span className={`flex flex-nowrap items-center px-3 py-1.5 rounded-full text-xs font-bold gap-1 ${
                     member.category === 'game'
                       ? 'bg-blue-100 text-blue-800'
                       : 'bg-indigo-100 text-indigo-800'
                   }`}>
-                    {member.category === 'game' ? '🎮 Game' : '🎨 Graphics'}
+                    {member.category === 'game' ? 
+                    ( <><span>🎮</span> Game</> ) : 
+                    ( <><span>🎨</span> Graphics</> )}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-600">{member.email || '—'}</td>
