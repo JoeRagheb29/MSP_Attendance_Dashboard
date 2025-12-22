@@ -8,17 +8,23 @@ export interface Member {
   email?: string;
   phone?: string;
   createdAt: string;
-  attendanceToday?: AttendanceStatus;
 }
 
 export interface Attendance {
   id: number;
   memberId: number;
-  date: string;
+  sessionId: number;
   status: AttendanceStatus;
   notes?: string;
 }
 
+export interface Session {
+  id: number;
+  name: string;
+  date: string;
+  createdAt: string;
+}
+
 export interface MemberWithAttendance extends Member {
-  attendanceToday?: AttendanceStatus;
+  attendance: Attendance[];
 }
