@@ -66,7 +66,7 @@ export const MemberList = ({
                   <span className={`flex flex-nowrap items-center px-3 py-1.5 rounded-full text-xs font-bold gap-1 ${
                     member.category === 'game'
                       ? isDarkMode ? 'bg-blue-900 text-blue-300' : 'bg-blue-100 text-blue-800'
-                      : isDarkMode ? 'bg-indigo-900 text-indigo-300' : 'bg-indigo-100 text-indigo-800'
+                      : isDarkMode ? 'bg-gray-800 text-indigo-300' : 'bg-indigo-100 text-gray-800'
                   }`}>
                     {member.category === 'game' ? 
                     ( <><span>🎮</span> Game</> ) : 
