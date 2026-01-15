@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FiX, FiSave } from "react-icons/fi";
-import type { Member, Category } from "../types";
+import type { Member } from "../types";
 
 interface AddMemberProps {
   onClose: () => void;
@@ -18,9 +18,10 @@ export const AddMember = ({
 }: AddMemberProps) => {
   const [formData, setFormData] = useState({
     name: editingMember?.name || "",
-    category: (editingMember?.category || "game") as Category,
+    category: editingMember?.category || "game",
     email: editingMember?.email || "",
     phone: editingMember?.phone || "",
+    role: editingMember?.role || 'attendee',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -163,6 +164,30 @@ export const AddMember = ({
               required
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-100 transition-all shadow-sm hover:shadow-md placeholder:font-normal placeholder:text-gray-400"
             />
+          </div>
+
+          {/* Role Input */}
+          <div className="mb-7">
+            <label
+              htmlFor="phone"
+              className="block text-sm font-bold text-gray-800 mb-2 uppercase tracking-wide"
+            >
+              Role:
+            </label>
+            <select
+              title="Select role"
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              disabled={loading}
+              required
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-100 transition-all shadow-sm hover:shadow-md"
+            >
+              <option value="attendee">Attendee</option>
+              <option value="member">Member</option>
+              <option value="organizer">Organizer</option>
+            </select>
           </div>
 
           {/* Action Buttons */}

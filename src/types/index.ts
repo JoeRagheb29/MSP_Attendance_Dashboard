@@ -1,10 +1,11 @@
 export type Category = 'game' | 'graphics';
 export type AttendanceStatus = 'present' | 'absent';
-
+export type Role = 'attendee' | 'member' | 'organizer';
 export interface Member {
   id: number;
   name: string;
   category: Category;
+  role: Role;
   email?: string;
   phone?: string;
   createdAt: string;

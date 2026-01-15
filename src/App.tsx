@@ -85,7 +85,7 @@ function App() {
       id: Math.max(...members.map(m => m.id), 0) + 1,
       createdAt: new Date().toISOString()
     }
-    setMembers([...members, member])
+    setMembers([member , ...members])
     handleCloseModal()
   }
 

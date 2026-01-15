@@ -51,6 +51,7 @@ export const MemberList = ({
               <th className={`px-6 py-4 text-left text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Email</th>
               <th className={`px-6 py-4 text-left text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Phone</th>
               <th className={`px-6 py-4 text-left text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Status</th>
+              <th className={`px-6 py-4 text-left text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Role</th>
               <th className={`px-6 py-4 text-left text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Mark/Unmark</th>
               <th className={`px-6 py-4 text-left text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Actions</th>
             </tr>
@@ -98,6 +99,7 @@ export const MemberList = ({
                     </span>
                   )} 
                 </td>
+                <td className={`px-6 py-4 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray600'}`}>{member.role || '—'}</td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <button
