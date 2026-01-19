@@ -12,24 +12,12 @@ import { useTheme } from './context/useTheme'
 // Mock data for development
 const MOCK_MEMBERS: Member[] = getMockMembers()
 const MOCK_SESSIONS: Session[] = [
-  {
-    id: 1,
-    name: 'Session 1',
-    date: new Date('2024-12-15').toISOString(),
-    createdAt: new Date('2024-12-15').toISOString(),
-  },
-  {
-    id: 2,
-    name: 'Session 2',
-    date: new Date('2024-12-18').toISOString(),
-    createdAt: new Date('2024-12-18').toISOString(),
-  },
-  {
-    id: 3,
-    name: 'Session 3',
-    date: new Date('2024-12-21').toISOString(),
-    createdAt: new Date('2024-12-21').toISOString(),
-  },
+  // {
+  //   id: 1,
+  //   name: 'Session 1',
+  //   date: new Date('2024-12-15').toISOString(),
+  //   createdAt: new Date('2024-12-15').toISOString(),
+  // },
 ]
 
 function App() {
