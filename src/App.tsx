@@ -7,6 +7,7 @@ import { AttendanceReport } from './components/AttendanceReport'
 import { getMockMembers } from './data/mockData'
 import NavBar from './components/NavBar'
 import Footer from './components/Footer'
+
 import { useTheme } from './context/useTheme'
 
 // Mock data for development
@@ -24,7 +25,10 @@ function App() {
   const [members, setMembers] = useState<Member[]>(MOCK_MEMBERS)
   const [sessions, setSessions] = useState<Session[]>(MOCK_SESSIONS)
   const [attendance, setAttendance] = useState<Attendance[]>([])
+
   const [selectedCategory, setSelectedCategory] = useState('all')
+  const [selectedRole, setSelectedRole] = useState('all')
+
   const [selectedSession, setSelectedSession] = useState<number>(sessions[sessions.length - 1]?.id || 1)
   const [searchQuery, setSearchQuery] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
@@ -135,7 +139,8 @@ function App() {
     const matchesSearch = !searchQuery || 
       member.name.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCategory = selectedCategory === 'all' || member.category === selectedCategory
-    return matchesSearch && matchesCategory
+    const matchesRole = selectedRole === 'all' || member.role === selectedRole
+    return matchesSearch && matchesCategory && matchesRole
   })
 
   const { isDarkMode } = useTheme()
@@ -147,6 +152,8 @@ function App() {
         handleAddClick={handleAddClick}
         selectedCategory={selectedCategory}
         onCategoryChange={setSelectedCategory}
+        selectedRole={selectedRole}
+        onRoleChange={setSelectedRole}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />

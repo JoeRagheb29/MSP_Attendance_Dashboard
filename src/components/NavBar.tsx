@@ -6,6 +6,8 @@ interface NavBarProps {
   handleAddClick: () => void
   selectedCategory?: string
   onCategoryChange?: (category: string) => void
+  selectedRole?: string
+  onRoleChange?: (role: string) => void
   searchQuery?: string
   onSearchChange?: (query: string) => void
 }
@@ -14,6 +16,8 @@ function NavBar({
   handleAddClick, 
   selectedCategory = 'all',
   onCategoryChange = () => {},
+  selectedRole = 'all',
+  onRoleChange = () => {},
   searchQuery = '',
   onSearchChange = () => {},
 }: NavBarProps) {
@@ -89,6 +93,23 @@ function NavBar({
               <option value="all">📂 All Members</option>
               <option value="game">🎮 Game</option>
               <option value="graphics">🎨 Graphics</option>
+            </select>
+
+            {/* Role Filter */}
+            <select
+              title="Filter by role"
+              value={selectedRole}
+              onChange={(e) => onRoleChange(e.target.value)}
+              className={`px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-md min-w-fit font-semibold ${
+                isDarkMode
+                  ? 'bg-gray-800 text-white border border-gray-700'
+                  : 'bg-white text-indigo-700'
+              }`}
+            >
+              <option value="all">👥 All Roles</option>
+              <option value="attendee">👤 Attendee</option>
+              <option value="member">👥 Member</option>
+              <option value="organizer">🎖️ Organizer</option>
             </select>
           </div>
         </div>

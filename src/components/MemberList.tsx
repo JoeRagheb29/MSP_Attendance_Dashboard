@@ -99,7 +99,17 @@ export const MemberList = ({
                     </span>
                   )} 
                 </td>
-                <td className={`px-6 py-4 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray600'}`}>{member.role || '—'}</td>
+                <td className="px-6 py-4 text-sm">
+                  <span className={`flex flex-nowrap items-center px-3 py-1.5 rounded-full text-xs font-bold gap-1 w-fit ${
+                    member.role === 'organizer'
+                      ? isDarkMode ? 'bg-yellow-900 text-yellow-300' : 'bg-yellow-100 text-yellow-800'
+                      : member.role === 'member'
+                      ? isDarkMode ? 'bg-purple-900 text-purple-300' : 'bg-purple-100 text-purple-800'
+                      : isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {member.role === 'organizer' ? '🎖️ Organizer' : member.role === 'member' ? '👥 Member' : '👤 Attendee'}
+                  </span>
+                </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <button
