@@ -22,14 +22,14 @@ const MOCK_SESSIONS: Session[] = [
 ]
 
 function App() {
-  const [members, setMembers] = useState<Member[]>(MOCK_MEMBERS)
-  const [sessions, setSessions] = useState<Session[]>(MOCK_SESSIONS)
+  const [members, setMembers] = useState<Member[]>([])
+  const [sessions, setSessions] = useState<Session[]>([])
   const [attendance, setAttendance] = useState<Attendance[]>([])
 
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedRole, setSelectedRole] = useState('all')
 
-  const [selectedSession, setSelectedSession] = useState<number>(sessions[sessions.length - 1]?.id || 1)
+  const [selectedSession, setSelectedSession] = useState<number>(0)
   const [searchQuery, setSearchQuery] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
   const [editingMember, setEditingMember] = useState<Member | null>(null)
@@ -38,9 +38,33 @@ function App() {
   const [currentView, setCurrentView] = useState<'list' | 'report'>('list')
 
   useEffect(() => {
-    // Uncomment to load from real server
-    // loadMembers()
+    loadData()
   }, [])
+
+  const loadData = async () => {
+    try {
+      setLoading(true)
+      setError('')
+      const [membersData, sessionsData] = await Promise.all([
+        memberService.getMembers(),
+        memberService.getSessions(),
+      ])
+      setMembers(membersData)
+      setSessions(sessionsData)
+      
+      // Load attendance for all sessions
+      if (sessionsData.length > 0) {
+        await loadAttendance(sessionsData)
+        // Set selected session to the latest one
+        setSelectedSession(sessionsData[sessionsData.length - 1].id)
+      }
+    } catch (err) {
+      setError('Failed to load data. Make sure the server is running.')
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const loadMembers = async () => {
     try {
@@ -53,6 +77,32 @@ function App() {
       console.error(err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadSessions = async () => {
+    try {
+      const data = await memberService.getSessions()
+      setSessions(data)
+      if (data.length > 0 && !data.find(s => s.id === selectedSession)) {
+        setSelectedSession(data[data.length - 1].id)
+      }
+    } catch (err) {
+      console.error('Failed to load sessions:', err)
+    }
+  }
+
+  const loadAttendance = async (sessionsList: Session[]) => {
+    try {
+      // Load attendance for all sessions
+      const allAttendance: Attendance[] = []
+      for (const session of sessionsList) {
+        const sessionAttendance = await memberService.getSessionAttendance(session.id)
+        allAttendance.push(...sessionAttendance)
+      }
+      setAttendance(allAttendance)
+    } catch (err) {
+      console.error('Failed to load attendance:', err)
     }
   }
 
@@ -71,68 +121,111 @@ function App() {
     setEditingMember(null)
   }
 
-  const handleAddMember = (newMember: Omit<Member, 'id' | 'createdAt'>) => {
-    const member: Member = {
-      ...newMember,
-      id: Math.max(...members.map(m => m.id), 0) + 1,
-      createdAt: new Date().toISOString()
+  const handleAddMember = async (newMember: Omit<Member, 'id' | 'createdAt'>) => {
+    try {
+      setError('')
+      const member = await memberService.addMember(newMember)
+      setMembers([member, ...members])
+      handleCloseModal()
+    } catch (err) {
+      setError('Failed to add member. Please try again.')
+      console.error(err)
     }
-    setMembers([member , ...members])
-    handleCloseModal()
   }
 
-  const handleUpdateMember = (updatedMember: Member) => {
-    setMembers(members.map(m => m.id === updatedMember.id ? updatedMember : m))
-    handleCloseModal()
+  const handleUpdateMember = async (updatedMember: Member) => {
+    try {
+      setError('')
+      const member = await memberService.updateMember(updatedMember.id, updatedMember)
+      setMembers(members.map(m => m.id === member.id ? member : m))
+      handleCloseModal()
+    } catch (err) {
+      setError('Failed to update member. Please try again.')
+      console.error(err)
+    }
   }
 
-  const handleDeleteMember = (id: number) => {
+  const handleDeleteMember = async (id: number) => {
     if (confirm('Are you sure you want to delete this member?')) {
-      setMembers(members.filter(m => m.id !== id))
-      // Also remove attendance records for this member
-      setAttendance(attendance.filter(a => a.memberId !== id))
-    }
-  }
-
-  const handleAddSession = () => {
-    const newSession: Session = {
-      id: Math.max(...sessions.map(s => s.id), 0) + 1,
-      name: `Session ${Math.max(...sessions.map(s => s.id), 0) + 1}`,
-      date: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
-    }
-    setSessions([...sessions, newSession])
-    setSelectedSession(newSession.id)
-  }
-
-  const handleMarkAttendance = (memberId: number, status: 'present' | 'absent') => {
-    // Check if attendance record already exists for this member in this session
-    const existingRecord = attendance.find(
-      a => a.memberId === memberId && a.sessionId === selectedSession
-    )
-
-    if (existingRecord) {
-      // Update existing record
-      setAttendance(
-        attendance.map(a =>
-          a.id === existingRecord.id ? { ...a, status } : a
-        )
-      )
-    } else {
-      // Create new attendance record
-      const newAttendance: Attendance = {
-        id: Math.max(...attendance.map(a => a.id), 0) + 1,
-        memberId,
-        sessionId: selectedSession,
-        status,
+      try {
+        setError('')
+        await memberService.deleteMember(id)
+        setMembers(members.filter(m => m.id !== id))
+        // Also remove attendance records for this member
+        setAttendance(attendance.filter(a => a.memberId !== id))
+      } catch (err) {
+        setError('Failed to delete member. Please try again.')
+        console.error(err)
       }
-      setAttendance([...attendance, newAttendance])
+    }
+  }
+
+  const handleAddSession = async () => {
+    try {
+      setError('')
+      const sessionNumber = sessions.length + 1
+      const newSession = await memberService.createSession({
+        name: `Session ${sessionNumber}`,
+        date: new Date().toISOString(),
+      })
+      setSessions([...sessions, newSession])
+      setSelectedSession(newSession.id)
+    } catch (err) {
+      setError('Failed to create session. Please try again.')
+      console.error(err)
+    }
+  }
+
+  const handleMarkAttendance = async (memberId: number, status: 'present' | 'absent') => {
+    try {
+      setError('')
+      // Check if attendance record already exists for this member in this session
+      const existingRecord = attendance.find(
+        a => a.memberId === memberId && a.sessionId === selectedSession
+      )
+
+      if (existingRecord) {
+        // Update existing record via API
+        const updated = await memberService.markAttendance(memberId, selectedSession, status)
+        setAttendance(
+          attendance.map(a =>
+            a.id === existingRecord.id ? updated : a
+          )
+        )
+      } else {
+        // Create new attendance record via API
+        const newAttendance = await memberService.markAttendance(memberId, selectedSession, status)
+        setAttendance([...attendance, newAttendance])
+      }
+    } catch (err) {
+      setError('Failed to mark attendance. Please try again.')
+      console.error(err)
     }
   }
 
   const getMemberAttendanceForSession = (memberId: number, sessionId: number): 'present' | 'absent' | null => {
     const record = attendance.find(a => a.memberId === memberId && a.sessionId === sessionId)
     return record ? record.status : null
+  }
+
+  // Reload attendance when a new session is added
+  const handleAddSession = async () => {
+    try {
+      setError('')
+      const sessionNumber = sessions.length + 1
+      const newSession = await memberService.createSession({
+        name: `Session ${sessionNumber}`,
+        date: new Date().toISOString(),
+      })
+      const updatedSessions = [...sessions, newSession]
+      setSessions(updatedSessions)
+      setSelectedSession(newSession.id)
+      // Reload attendance to include the new session
+      await loadAttendance(updatedSessions)
+    } catch (err) {
+      setError('Failed to create session. Please try again.')
+      console.error(err)
+    }
   }
 
   const filteredMembers = members.filter((member) => {
@@ -213,19 +306,24 @@ function App() {
                 <label htmlFor="session-select" className={`font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Current Session:</label>
                 <select
                   id="session-select"
-                  value={selectedSession}
+                  value={selectedSession || ''}
                   onChange={(e) => setSelectedSession(Number(e.target.value))}
                   className={`flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
                     isDarkMode
                       ? 'bg-gray-700 border-gray-600 text-white'
                       : 'bg-white border-gray-300 text-gray-900'
                   }`}
+                  disabled={sessions.length === 0}
                 >
-                  {sessions.map(session => (
-                    <option key={session.id} value={session.id}>
-                      {session.name} - {new Date(session.date).toLocaleDateString()}
-                    </option>
-                  ))}
+                  {sessions.length === 0 ? (
+                    <option value="">No sessions available</option>
+                  ) : (
+                    sessions.map(session => (
+                      <option key={session.id} value={session.id}>
+                        {session.name} - {new Date(session.date).toLocaleDateString()}
+                      </option>
+                    ))
+                  )}
                 </select>
                 <button
                   onClick={handleAddSession}
