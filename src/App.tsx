@@ -160,22 +160,6 @@ function App() {
     }
   }
 
-  const handleAddSession = async () => {
-    try {
-      setError('')
-      const sessionNumber = sessions.length + 1
-      const newSession = await memberService.createSession({
-        name: `Session ${sessionNumber}`,
-        date: new Date().toISOString(),
-      })
-      setSessions([...sessions, newSession])
-      setSelectedSession(newSession.id)
-    } catch (err) {
-      setError('Failed to create session. Please try again.')
-      console.error(err)
-    }
-  }
-
   const handleMarkAttendance = async (memberId: number, status: 'present' | 'absent') => {
     try {
       setError('')
