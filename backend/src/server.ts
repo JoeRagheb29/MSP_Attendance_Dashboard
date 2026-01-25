@@ -14,22 +14,20 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const isVercel = process.env.VERCEL === '1';
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Get public directory path
-const publicPath = path.join(__dirname, '../../public');
-
-// Health check endpoint
-app.get('/health', (req, res) => {
+function healthResponse(res: express.Response) {
   res.json({ status: 'ok', message: 'MSP Attendance API is running' });
-});
+}
 
-// API info endpoint
+app.get('/health', (req, res) => healthResponse(res));
+app.get('/api/health', (req, res) => healthResponse(res));
+
 app.get('/api', (req, res) => {
-  res.json({ 
+  res.json({
     message: 'MSP Attendance API',
     version: '1.0.0',
     endpoints: {
@@ -40,48 +38,43 @@ app.get('/api', (req, res) => {
       admin: {
         database: '/api/admin/database',
         stats: '/api/admin/stats',
-        membersAttendance: '/api/admin/members-attendance'
-      }
-    }
+        membersAttendance: '/api/admin/members-attendance',
+      },
+    },
   });
 });
 
-// API routes (must come before static files)
 app.use('/api/members', membersRouter);
 app.use('/api/sessions', sessionsRouter);
 app.use('/api/attendance', attendanceRouter);
 app.use('/api/admin', adminRouter);
 
-// Error handling middleware
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: unknown, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// Serve static files from public directory
-app.use(express.static(publicPath));
+if (!isVercel) {
+  const publicPath = path.join(__dirname, '../../public');
+  app.use(express.static(publicPath));
+  app.use('/api/*', (req, res) => {
+    res.status(404).json({ error: 'Route not found' });
+  });
+  app.get('*', (req, res) => {
+    if (req.path.startsWith('/api')) {
+      return res.status(404).json({ error: 'Route not found' });
+    }
+    res.sendFile(path.join(publicPath, 'index.html'));
+  });
+} else {
+  app.use((_req, res) => {
+    res.status(404).json({ error: 'Route not found' });
+  });
+}
 
-// 404 handler for API routes
-app.use('/api/*', (req, res) => {
-  res.status(404).json({ error: 'Route not found' });
-});
-
-// Serve index.html for root and all other non-API routes
-app.get('*', (req, res) => {
-  // Don't serve HTML for API routes
-  if (req.path.startsWith('/api')) {
-    return res.status(404).json({ error: 'Route not found' });
-  }
-  res.sendFile(path.join(publicPath, 'index.html'));
-});
-
-// Initialize database and start server
 async function startServer() {
   try {
-    // Initialize database tables
     await initDatabase();
-    
-    // Start server
     app.listen(PORT, () => {
       console.log(`🚀 Server is running on http://localhost:${PORT}`);
       console.log(`📊 API available at http://localhost:${PORT}/api`);
@@ -92,17 +85,19 @@ async function startServer() {
   }
 }
 
-startServer();
+if (!isVercel) {
+  startServer();
+  process.on('SIGINT', async () => {
+    console.log('\n🛑 Shutting down server...');
+    await db.close();
+    process.exit(0);
+  });
+  process.on('SIGTERM', async () => {
+    console.log('\n🛑 Shutting down server...');
+    await db.close();
+    process.exit(0);
+  });
+}
 
-// Graceful shutdown
-process.on('SIGINT', async () => {
-  console.log('\n🛑 Shutting down server...');
-  await db.close();
-  process.exit(0);
-});
-
-process.on('SIGTERM', async () => {
-  console.log('\n🛑 Shutting down server...');
-  await db.close();
-  process.exit(0);
-});
+export default app;
+export { initDatabase };

@@ -1,11 +1,49 @@
 import axios from "axios";
 import type { Member, Attendance, Session, Category, AttendanceStatus } from '../types';
 
-const API_BASE = 'http://localhost:3001/api';
+const API_BASE = '/api';
 
 const api = axios.create({
   baseURL: API_BASE,
+  timeout: 5000,
 });
+
+// Add request interceptor for logging
+api.interceptors.request.use(
+  (config) => {
+    console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`);
+    return config;
+  },
+  (error) => {
+    console.error('[API] Request error:', error);
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor for better error handling
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.code === 'ECONNREFUSED' || error.message.includes('Network Error')) {
+      console.error('[API] Connection refused. Is the backend server running on http://localhost:3001?');
+      error.message = 'Cannot connect to backend server. Make sure the backend is running on http://localhost:3001';
+    } else if (error.code === 'ETIMEDOUT') {
+      console.error('[API] Request timeout. The server might be slow or not responding.');
+      error.message = 'Request timeout. The backend server might be slow or not responding.';
+    } else if (error.response) {
+      // Server responded with error status
+      console.error(`[API] Server error: ${error.response.status} - ${error.response.statusText}`);
+      error.message = `Server error: ${error.response.status} ${error.response.statusText}`;
+    } else if (error.request) {
+      // Request was made but no response received
+      console.error('[API] No response received from server');
+      error.message = 'No response from server. Check if the backend is running.';
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const memberService = {
   // Get all members

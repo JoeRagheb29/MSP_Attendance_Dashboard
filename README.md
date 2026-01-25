@@ -15,14 +15,46 @@ A simple HR management system for student workshop activities. Built with React,
 
 ## Quick Start
 
+### Option 1: Run Frontend and Backend Together (Recommended)
+
+1. **Install all dependencies**
+
+```bash
+npm run install:all
+```
+
+2. **Start both servers**
+
+```bash
+npm run dev:all
+```
+
+This will start:
+- Backend API on `http://localhost:3001`
+- Frontend on `http://localhost:5173`
+
+### Option 2: Run Separately
+
 1. **Install dependencies**
 
 ```bash
+# Frontend
+npm install
+
+# Backend
+cd backend
 npm install
 ```
 
-2. **Start the development server**
+2. **Start the servers**
 
+**Terminal 1 - Backend:**
+```bash
+cd backend
+npm run dev
+```
+
+**Terminal 2 - Frontend:**
 ```bash
 npm run dev
 ```
@@ -31,10 +63,22 @@ npm run dev
 
 ## Available Scripts
 
-- **`npm run dev`** - Start the development server with hot reload
-- **`npm run build`** - Build for production
+### Root Directory
+
+- **`npm run dev:all`** - Run both frontend and backend together
+- **`npm run dev`** - Start only the frontend development server
+- **`npm run dev:backend`** - Start only the backend server
+- **`npm run install:all`** - Install dependencies for both frontend and backend
+- **`npm run build:all`** - Build both frontend and backend for production
+- **`npm run build`** - Build frontend for production
 - **`npm run preview`** - Preview the production build
 - **`npm run lint`** - Run ESLint to check code quality
+
+### Backend Directory
+
+- **`npm run dev`** - Start backend with hot reload
+- **`npm run build`** - Build backend for production
+- **`npm start`** - Run production build
 
 ## Project Structure
 

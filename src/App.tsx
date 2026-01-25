@@ -4,22 +4,11 @@ import { memberService } from './api/memberService'
 import { MemberList } from './components/MemberList'
 import { AddMember } from './components/AddMember'
 import { AttendanceReport } from './components/AttendanceReport'
-import { getMockMembers } from './data/mockData'
 import NavBar from './components/NavBar'
 import Footer from './components/Footer'
+import { checkApiHealth } from './utils/apiHealthCheck'
 
 import { useTheme } from './context/useTheme'
-
-// Mock data for development
-const MOCK_MEMBERS: Member[] = getMockMembers()
-const MOCK_SESSIONS: Session[] = [
-  // {
-  //   id: 1,
-  //   name: 'Session 1',
-  //   date: new Date('2024-12-15').toISOString(),
-  //   createdAt: new Date('2024-12-15').toISOString(),
-  // },
-]
 
 function App() {
   const [members, setMembers] = useState<Member[]>([])
@@ -45,6 +34,15 @@ function App() {
     try {
       setLoading(true)
       setError('')
+      
+      // First check if the API is accessible
+      const isHealthy = await checkApiHealth()
+      if (!isHealthy) {
+        setError('Cannot connect to backend server. Please make sure the backend is running on http://localhost:3001')
+        setLoading(false)
+        return
+      }
+      
       const [membersData, sessionsData] = await Promise.all([
         memberService.getMembers(),
         memberService.getSessions(),
@@ -58,9 +56,10 @@ function App() {
         // Set selected session to the latest one
         setSelectedSession(sessionsData[sessionsData.length - 1].id)
       }
-    } catch (err) {
-      setError('Failed to load data. Make sure the server is running.')
-      console.error(err)
+    } catch (err: any) {
+      const errorMessage = err?.message || 'Failed to load data. Make sure the server is running.'
+      setError(errorMessage)
+      console.error('Load data error:', err)
     } finally {
       setLoading(false)
     }
@@ -77,18 +76,6 @@ function App() {
       console.error(err)
     } finally {
       setLoading(false)
-    }
-  }
-
-  const loadSessions = async () => {
-    try {
-      const data = await memberService.getSessions()
-      setSessions(data)
-      if (data.length > 0 && !data.find(s => s.id === selectedSession)) {
-        setSelectedSession(data[data.length - 1].id)
-      }
-    } catch (err) {
-      console.error('Failed to load sessions:', err)
     }
   }
 
@@ -239,11 +226,22 @@ function App() {
         {/* Error Banner */}
         {error && (
           <div className={`mb-6 border-l-4 border-red-500 p-4 rounded-lg shadow-sm ${isDarkMode ? 'bg-red-900 bg-opacity-30' : 'bg-red-50'}`}>
-            <div className="flex items-center justify-between">
-              <p className={`font-medium ${isDarkMode ? 'text-red-400' : 'text-red-700'}`}>{error}</p>
-              <button onClick={loadMembers} className={`font-semibold text-sm ${isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-800'}`}>
-                Retry
-              </button>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <p className={`font-medium ${isDarkMode ? 'text-red-400' : 'text-red-700'}`}>{error}</p>
+                <button onClick={loadData} className={`font-semibold text-sm px-4 py-2 rounded ${isDarkMode ? 'bg-red-800 text-red-200 hover:bg-red-700' : 'bg-red-600 text-white hover:bg-red-700'}`}>
+                  Retry
+                </button>
+              </div>
+              <div className={`text-sm ${isDarkMode ? 'text-red-300' : 'text-red-600'}`}>
+                <p className="font-semibold mb-1">Troubleshooting steps:</p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Make sure the backend server is running: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">cd backend && npm run dev</code></li>
+                  <li>Or run both together: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">npm run dev:all</code></li>
+                  <li>Check if the backend is accessible at <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">http://localhost:3001/health</code></li>
+                  <li>Check the browser console (F12) for detailed error messages</li>
+                </ul>
+              </div>
             </div>
           </div>
         )}
