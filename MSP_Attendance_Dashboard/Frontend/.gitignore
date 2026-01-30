@@ -22,10 +22,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-node_modules/
-dist/
-*.db
-*.db-journal
-.env
-.DS_Store
-logs/
