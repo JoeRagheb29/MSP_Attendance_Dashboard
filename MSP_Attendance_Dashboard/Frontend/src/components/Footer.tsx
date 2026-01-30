@@ -35,7 +35,7 @@ const Footer = () => {
                 Designed & Developed by 
                 <div className="flex flex-col">
                   <span className="text-indigo-600 font-semibold">Front End Head: Youssef Ragheb</span>
-                  <span className="text-indigo-600 font-semibold">Back End (Position) : John Doe</span>
+                  <span className="text-indigo-600 font-semibold">Back End VH: Youssef Hassan</span>
                 </div>
               </p>
             </div>

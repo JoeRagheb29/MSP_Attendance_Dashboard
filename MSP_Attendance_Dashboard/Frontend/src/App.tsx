@@ -56,8 +56,8 @@ function App() {
         // Set selected session to the latest one
         setSelectedSession(sessionsData[sessionsData.length - 1].id)
       }
-    } catch (err: any) {
-      const errorMessage = err?.message || 'Failed to load data. Make sure the server is running.'
+    } catch (err: unknown) {
+      const errorMessage = (err as { message?: string })?.message || 'Failed to load data. Make sure the server is running.'
       setError(errorMessage)
       console.error('Load data error:', err)
     } finally {
