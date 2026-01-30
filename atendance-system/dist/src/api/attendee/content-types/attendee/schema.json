@@ -1,0 +1,36 @@
+{
+    "kind": "collectionType",
+    "collectionName": "attendees",
+    "info": {
+        "singularName": "attendee",
+        "pluralName": "attendees",
+        "displayName": "Attendee"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "name": {
+            "type": "string",
+            "required": true
+        },
+        "email": {
+            "type": "email",
+            "required": true,
+            "unique": false
+        },
+        "phone": {
+            "type": "string"
+        },
+        "role": {
+            "type": "enumeration",
+            "default": "attendee",
+            "enum": [
+                "attendee",
+                "member",
+                "organizer"
+            ]
+        }
+    }
+}
