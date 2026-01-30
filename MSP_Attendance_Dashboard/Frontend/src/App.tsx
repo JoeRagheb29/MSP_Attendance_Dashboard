@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from  'react'
 import type { Member, Attendance, Session } from './types'
 import { memberService } from './api/memberService'
 import { MemberList } from './components/MemberList'
@@ -42,40 +42,6 @@ function App() {
     // loadMembers()
   }, [])
 
-  const loadData = async () => {
-    try {
-      setLoading(true)
-      setError('')
-      
-      // First check if the API is accessible
-      const isHealthy = await checkApiHealth()
-      if (!isHealthy) {
-        setError('Cannot connect to backend server. Please make sure the backend is running on http://localhost:3001')
-        setLoading(false)
-        return
-      }
-      
-      const [membersData, sessionsData] = await Promise.all([
-        memberService.getMembers(),
-        memberService.getSessions(),
-      ])
-      setMembers(membersData)
-      setSessions(sessionsData)
-      
-      // Load attendance for all sessions
-      if (sessionsData.length > 0) {
-        await loadAttendance(sessionsData)
-        // Set selected session to the latest one
-        setSelectedSession(sessionsData[sessionsData.length - 1].id)
-      }
-    } catch (err: any) {
-      const errorMessage = err?.message || 'Failed to load data. Make sure the server is running.'
-      setError(errorMessage)
-      console.error('Load data error:', err)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const loadMembers = async () => {
     try {

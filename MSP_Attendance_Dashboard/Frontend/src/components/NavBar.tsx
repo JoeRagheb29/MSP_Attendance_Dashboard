@@ -1,6 +1,6 @@
 import { FiPlus, FiSearch, FiMoon, FiSun } from 'react-icons/fi'
-import logo from '../assets/logo.jpg'
 import { useTheme } from '../context/useTheme'
+const logo = '/assets/logo.jpg'
 
 interface NavBarProps {
   handleAddClick: () => void
