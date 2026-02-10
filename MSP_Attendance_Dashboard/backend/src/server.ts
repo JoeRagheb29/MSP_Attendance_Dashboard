@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import authRouter from './routes/auth.js';
 import membersRouter from './routes/members.js';
 import sessionsRouter from './routes/sessions.js';
 import attendanceRouter from './routes/attendance.js';
@@ -16,7 +17,28 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const isVercel = process.env.VERCEL === '1';
 
-app.use(cors());
+// CORS configuration to accept requests from any port
+const corsOptions = {
+  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+    // Allow requests with no origin (mobile apps, curl requests, etc.)
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+    // Allow any localhost with different ports
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      callback(null, true);
+      return;
+    }
+    // Allow all origins (for development)
+    callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 function healthResponse(res: express.Response) {
@@ -32,6 +54,7 @@ app.get('/api', (req, res) => {
     version: '1.0.0',
     endpoints: {
       health: '/health',
+      auth: '/api/auth',
       members: '/api/members',
       sessions: '/api/sessions',
       attendance: '/api/attendance',
@@ -52,6 +75,7 @@ app.use('/api/members', membersRouter);
 app.use('/api/sessions', sessionsRouter);
 app.use('/api/attendance', attendanceRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/auth', authRouter);
 
 app.use((err: unknown, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Error:', err);
