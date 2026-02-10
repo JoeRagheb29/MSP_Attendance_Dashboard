@@ -2,9 +2,8 @@ import React from 'react'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
-  const isAuthenticated : boolean = true; // Replace with real authentication logic
+  const isAuthenticated : boolean = localStorage.getItem('token') !== null;
 
-  
   return (
     <>
       {isAuthenticated ? <div>{children}</div> : <div>Access Denied</div>}
