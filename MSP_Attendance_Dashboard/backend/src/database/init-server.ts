@@ -2,6 +2,18 @@ import { db } from './db.js';
 
 export async function initDatabase() {
   try {
+    // Create users table for authentication
+    await db.run(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL,
+        role TEXT NOT NULL CHECK(role IN ('admin', 'moderator', 'user')) DEFAULT 'user',
+        createdAt TEXT NOT NULL DEFAULT (datetime('now')),
+        updatedAt TEXT NOT NULL DEFAULT (datetime('now'))
+      )
+    `);
+
     // Create members table
     await db.run(`
       CREATE TABLE IF NOT EXISTS members (
