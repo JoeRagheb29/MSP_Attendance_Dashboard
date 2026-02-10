@@ -31,13 +31,12 @@ const Footer = () => {
               <p className="text-gray-500 text-sm">
                 © 2025 Attendance Management System. All rights reserved.
               </p>
-              <p className="text-gray-500 text-sm mt-4 md:mt-0">
+              <div className="text-gray-500 text-sm mt-4 md:mt-0">
                 Designed & Developed by 
                 <div className="flex flex-col">
-                  <span className="text-indigo-600 font-semibold">Front End Head: Youssef Ragheb</span>
-                  <span className="text-indigo-600 font-semibold">Back End VH: Youssef Hassan</span>
+                  <span className="text-indigo-600 font-semibold">FullStack Eng/ Youssef Ragheb</span>
                 </div>
-              </p>
+              </div>
             </div>
           </div>
         </div>
