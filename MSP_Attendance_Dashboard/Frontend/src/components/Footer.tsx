@@ -1,4 +1,4 @@
-
+import Logout from "./Logout";
 
 const Footer = () => {
   return (
@@ -11,6 +11,7 @@ const Footer = () => {
               <p className="text-gray-400 text-sm leading-relaxed">
                 A simple yet powerful HR management system for student workshop activities. Built with modern technologies to manage members, track attendance, and organize activities efficiently.
               </p>
+              <Logout />
             </div>
 
             {/* Quick Links */}
