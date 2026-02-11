@@ -139,7 +139,7 @@ function App() {
         await memberService.deleteMember(id)
         setMembers(members.filter(m => m.id !== id))
         // Also remove attendance records for this member
-        setAttendance(attendance.filter(a => a.memberId !== id))
+        setAttendance(attendance.filter(a => a.member_id !== id))
       } catch (err) {
         setError('Failed to delete member. Please try again.')
         console.error(err)
@@ -147,17 +147,17 @@ function App() {
     }
   }
 
-  const handleMarkAttendance = async (memberId: number, status: 'present' | 'absent') => {
+  const handleMarkAttendance = async (member_id: number, status: 'present' | 'absent') => {
     try {
       setError('')
       // Check if attendance record already exists for this member in this session
       const existingRecord = attendance.find(
-        a => a.memberId === memberId && a.sessionId === selectedSession
+        a => a.member_id === member_id && a.session_id === selectedSession
       )
 
       if (existingRecord) {
         // Update existing record via API
-        const updated = await memberService.markAttendance(memberId, selectedSession, status)
+        const updated = await memberService.markAttendance(member_id, selectedSession, status)
         setAttendance(
           attendance.map(a =>
             a.id === existingRecord.id ? updated : a
@@ -165,7 +165,7 @@ function App() {
         )
       } else {
         // Create new attendance record via API
-        const newAttendance = await memberService.markAttendance(memberId, selectedSession, status)
+        const newAttendance = await memberService.markAttendance(member_id, selectedSession, status)
         setAttendance([...attendance, newAttendance])
       }
     } catch (err) {
@@ -174,8 +174,8 @@ function App() {
     }
   }
 
-  const getMemberAttendanceForSession = (memberId: number, sessionId: number): 'present' | 'absent' | null => {
-    const record = attendance.find(a => a.memberId === memberId && a.sessionId === sessionId)
+  const getMemberAttendanceForSession = (member_id: number, session_id: number): 'present' | 'absent' | null => {
+    const record = attendance.find(a => a.member_id === member_id && a.session_id === session_id)
     return record ? record.status : null
   }
 
@@ -210,134 +210,151 @@ function App() {
   const { isDarkMode } = useTheme()
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'bg-black' : 'bg-linear-to-br from-slate-50 to-slate-100'}`}>
-      {/* Header */}
-      <NavBar 
-        handleAddClick={handleAddClick}
-        selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
-        selectedRole={selectedRole}
-        onRoleChange={setSelectedRole}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {error && (
-          <div className={`mb-6 border-l-4 border-red-500 p-4 rounded-lg shadow-sm ${isDarkMode ? 'bg-red-900 bg-opacity-30' : 'bg-red-50'}`}>
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <p className={`font-medium ${isDarkMode ? 'text-red-400' : 'text-red-700'}`}>{error}</p>
-                <button onClick={loadData} className={`font-semibold text-sm px-4 py-2 rounded ${isDarkMode ? 'bg-red-800 text-red-200 hover:bg-red-700' : 'bg-red-600 text-white hover:bg-red-700'}`}>
-                  Retry
-                </button>
-              </div>
-              <div className={`text-sm ${isDarkMode ? 'text-red-300' : 'text-red-600'}`}>
-                <p className="font-semibold mb-1">Troubleshooting steps:</p>
-                <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li>Make sure the backend server is running: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">cd backend && npm run dev</code></li>
-                  <li>Or run both together: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">npm run dev:all</code></li>
-                  <li>Check if the backend is accessible at <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">http://localhost:3001/health</code></li>
-                  <li>Check the browser console (F12) for detailed error messages</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        )}
+    
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-black text-white' : 'bg-linear-to-br from-slate-50 to-slate-100 text-slate-900'}`}>
+  {/* Header - NavBar */}
+  <NavBar 
+    handleAddClick={handleAddClick}
+    selectedCategory={selectedCategory}
+    onCategoryChange={setSelectedCategory}
+    selectedRole={selectedRole}
+    onRoleChange={setSelectedRole}
+    searchQuery={searchQuery}
+    onSearchChange={setSearchQuery}
+  />
 
-        <div className="mb-6 flex gap-2">
-          <button
-            onClick={() => setCurrentView('list')}
-            className={`px-6 py-2 rounded-lg font-semibold transition-colors ${
-              currentView === 'list'
-                ? 'bg-indigo-600 text-white'
-                : isDarkMode
-                ? 'bg-gray-800 text-gray-300 border border-gray-600 hover:bg-gray-700'
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            📋 Members List
-          </button>
-          <button
-            onClick={() => setCurrentView('report')}
-            className={`px-6 py-2 rounded-lg font-semibold transition-colors ${
-              currentView === 'report'
-                ? 'bg-indigo-600 text-white'
-                : isDarkMode
-                ? 'bg-gray-800 text-gray-300 border border-gray-600 hover:bg-gray-700'
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            📊 Attendance Report
-          </button>
+  <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    
+    {/* Error Section - محسن للدارك واللايت */}
+    {error && (
+      <div className={`mb-6 border-l-4 border-red-500 p-5 rounded-xl shadow-sm transition-all ${isDarkMode ? 'bg-red-900/20 border-opacity-50' : 'bg-red-50'}`}>
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <p className={`font-bold ${isDarkMode ? 'text-red-400' : 'text-red-700'}`}>⚠️ {error}</p>
+            <button onClick={loadData} className={`font-bold text-sm px-6 py-2 rounded-lg transition-transform active:scale-95 ${isDarkMode ? 'bg-red-800 text-red-100 hover:bg-red-700' : 'bg-red-600 text-white hover:bg-red-700'}`}>
+              Retry Connection
+            </button>
+          </div>
+          <div className={`text-sm p-3 rounded-lg ${isDarkMode ? 'bg-black/40 text-red-300/80' : 'bg-white/50 text-red-600'}`}>
+            <p className="font-bold mb-2 underline">Troubleshooting steps:</p>
+            <ul className="list-disc list-inside space-y-1 ml-2 opacity-90">
+              <li>Server status: <code className="bg-gray-800 text-pink-400 px-1 rounded">npm run dev:all</code></li>
+              <li>Endpoint: <code className="bg-gray-800 text-pink-400 px-1 rounded">localhost:3001/health</code></li>
+              <li>Check browser console (F12)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* View Switcher Tabs */}
+    <div className="mb-8 flex p-1.5 bg-gray-200/50 dark:bg-gray-800/50 rounded-xl w-fit gap-1">
+      <button
+        onClick={() => setCurrentView('list')}
+        className={`px-8 py-2.5 rounded-lg font-bold transition-all duration-200 ${
+          currentView === 'list'
+            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
+            : isDarkMode
+            ? 'text-gray-400 hover:bg-gray-700 hover:text-white'
+            : 'text-gray-600 hover:bg-white hover:text-indigo-600'
+        }`}
+      >
+        📋 Members
+      </button>
+      <button
+        onClick={() => setCurrentView('report')}
+        className={`px-8 py-2.5 rounded-lg font-bold transition-all duration-200 ${
+          currentView === 'report'
+            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
+            : isDarkMode
+            ? 'text-gray-400 hover:bg-gray-700 hover:text-white'
+            : 'text-gray-600 hover:bg-white hover:text-indigo-600'
+        }`}
+      >
+        📊 Reports
+      </button>
+    </div>
+
+    {/* Main Content Loading State */}
+    {loading ? (
+      <div className={`flex flex-col items-center justify-center py-24 rounded-2xl border-2 border-dashed ${isDarkMode ? 'bg-gray-900/50 border-gray-800' : 'bg-white border-gray-100'}`}>
+        <div className={`w-12 h-12 border-4 rounded-full animate-spin mb-4 ${isDarkMode ? 'border-gray-800 border-t-indigo-500' : 'border-indigo-100 border-t-indigo-600'}`}></div>
+        <p className={`font-bold animate-pulse ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Fetching Secure Data...</p>
+      </div>
+    ) : currentView === 'list' ? (
+      <>
+        {/* Session Selector Card */}
+        <div className={`mb-8 rounded-2xl shadow-sm p-6 border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-slate-200'}`}>
+          <div className="flex flex-col sm:flex-row items-center gap-6">
+            <div className="flex items-center gap-3">
+               <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+               </div>
+               <label htmlFor="session-select" className={`font-bold whitespace-nowrap ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>Active Session</label>
+            </div>
+            
+            <select
+              id="session-select"
+              value={selectedSession || ''}
+              onChange={(e) => setSelectedSession(Number(e.target.value))}
+              className={`flex-1 px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-medium ${
+                isDarkMode
+                  ? 'bg-gray-800 border-gray-700 text-white hover:border-gray-600'
+                  : 'bg-slate-50 border-slate-200 text-slate-900 hover:border-slate-300'
+              }`}
+              disabled={sessions.length === 0}
+            >
+              {sessions.length === 0 ? (
+                <option value="">No sessions available</option>
+              ) : (
+                sessions.map(session => (
+                  <option key={session.id} value={session.id}>
+                    {session.name} — {new Date(session.date).toLocaleDateString(undefined, {month: 'short', day: 'numeric'})}
+                  </option>
+                ))
+              )}
+            </select>
+            
+            <button
+              onClick={handleAddSession}
+              className="w-full sm:w-auto px-8 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
+            >
+              + New Session
+            </button>
+          </div>
         </div>
 
-        {loading ? (
-          <div className={`flex flex-col items-center justify-center py-20 rounded-xl shadow-md ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-            <div className={`w-14 h-14 border-4 rounded-full animate-spin mb-4 ${isDarkMode ? 'border-gray-700 border-t-indigo-500' : 'border-indigo-200 border-t-indigo-600'}`}></div>
-            <p className={`font-medium text-lg ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Loading members...</p>
-          </div>
-        ) : currentView === 'list' ? (
-          <>
-            <div className={`mb-6 rounded-xl shadow-md p-6 border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                <label htmlFor="session-select" className={`font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Current Session:</label>
-                <select
-                  id="session-select"
-                  value={selectedSession || ''}
-                  onChange={(e) => setSelectedSession(Number(e.target.value))}
-                  className={`flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                    isDarkMode
-                      ? 'bg-gray-700 border-gray-600 text-white'
-                      : 'bg-white border-gray-300 text-gray-900'
-                  }`}
-                  disabled={sessions.length === 0}
-                >
-                  {sessions.length === 0 ? (
-                    <option value="">No sessions available</option>
-                  ) : (
-                    sessions.map(session => (
-                      <option key={session.id} value={session.id}>
-                        {session.name} - {new Date(session.date).toLocaleDateString()}
-                      </option>
-                    ))
-                  )}
-                </select>
-                <button
-                  onClick={handleAddSession}
-                  className={`px-4 py-2 rounded-lg transition-colors font-semibold ${
-                    isDarkMode
-                      ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                      : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                  }`}
-                >
-                  + New Session
-                </button>
-              </div>
-            </div>
-            <MemberList
-              members={filteredMembers}
-              selectedCategory={selectedCategory}
-              onRefresh={loadMembers}
-              onEdit={handleEditClick}
-              onDelete={handleDeleteMember}
-              onMarkAttendance={handleMarkAttendance}
-              getMemberAttendanceForSession={getMemberAttendanceForSession}
-              selectedSession={selectedSession}
-            />
-          </>
-        ) : (
-          <AttendanceReport
+        {/* Members Table Area */}
+        <div className="transition-all duration-500">
+          <MemberList
             members={filteredMembers}
-            sessions={sessions}
-            attendance={attendance}
             selectedCategory={selectedCategory}
-            searchQuery={searchQuery}
+            onRefresh={loadMembers}
+            onEdit={handleEditClick}
+            onDelete={handleDeleteMember}
+            onMarkAttendance={handleMarkAttendance}
+            getMemberAttendanceForSession={getMemberAttendanceForSession}
+            selectedSession={selectedSession}
           />
-        )}
-      </main>
+        </div>
+      </>
+    ) : (
+      <div className="animate-in fade-in duration-500">
+        <AttendanceReport
+          members={filteredMembers}
+          sessions={sessions}
+          attendance={attendance}
+          selectedCategory={selectedCategory}
+          searchQuery={searchQuery}
+        />
+      </div>
+    )}
+  </main>
 
-      {/* Modal */}
-      {showAddModal && (
+  {/* Modals & Overlays */}
+  {showAddModal && (
+    <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/40 flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl animate-in zoom-in-95 duration-200">
         <AddMember
           onClose={handleCloseModal}
           onSuccess={editingMember ? () => {} : () => {}}
@@ -345,11 +362,12 @@ function App() {
           onAddMember={handleAddMember}
           onUpdateMember={handleUpdateMember}
         />
-      )}
-
-      {/* Footer */}
-      <Footer />
+      </div>
     </div>
+  )}
+
+  <Footer />
+</div>
   )
 }
 
