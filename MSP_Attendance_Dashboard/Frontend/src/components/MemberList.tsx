@@ -8,8 +8,8 @@ interface MemberListProps {
   onRefresh: () => void
   onEdit: (member: Member) => void
   onDelete: (id: number) => void
-  onMarkAttendance: (memberId: number, status: 'present' | 'absent') => void
-  getMemberAttendanceForSession: (memberId: number, sessionId: number) => 'present' | 'absent' | null
+  onMarkAttendance: (member_id: number, status: 'present' | 'absent') => void
+  getMemberAttendanceForSession: (member_id: number, session_id: number) => 'present' | 'absent' | null
   selectedSession: number
 }
 

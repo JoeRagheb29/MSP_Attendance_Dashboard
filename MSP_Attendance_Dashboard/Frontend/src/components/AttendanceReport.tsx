@@ -26,16 +26,16 @@ export const AttendanceReport = ({
   })
 
   // Get attendance for a member in a specific session
-  const getAttendanceStatus = (memberId: number, sessionId: number) => {
+  const getAttendanceStatus = (member_id: number, session_id: number) => {
     const record = attendance.find(
-      a => a.memberId === memberId && a.sessionId === sessionId
+      a => a.member_id === member_id && a.session_id === session_id
     )
     return record?.status || null
   }
 
   // Count attendance for a member
-  const getAttendanceStats = (memberId: number) => {
-    const memberAttendance = attendance.filter(a => a.memberId === memberId)
+  const getAttendanceStats = (member_id: number) => {
+    const memberAttendance = attendance.filter(a => a.member_id === member_id)
     const present = memberAttendance.filter(a => a.status === 'present').length
     const absent = memberAttendance.filter(a => a.status === 'absent').length
     const notMarked = sessions.length - present - absent
