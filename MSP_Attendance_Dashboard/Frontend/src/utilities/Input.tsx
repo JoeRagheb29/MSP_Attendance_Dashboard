@@ -6,7 +6,7 @@ interface Iprops extends React.InputHTMLAttributes<HTMLInputElement> {
 
 const Input = ({ className , ...rest } : Iprops)  => {
   return (
-      <input className={`px-4 py-2.5 border rounded-lg shadow-sm hover:shadow-md placeholder:opacity-40 placeholder:font-normal placeholder:text-gray-800 bg-gray-50 text-gray-900 focus:border-r-blue-500 ${className ? className : ''}`}
+      <input className={`w-full px-4 py-2.5 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition-all placeholder:opacity-40 ${className ? className : ''}`}
             {...rest}
       />
   )
