@@ -36,50 +36,35 @@ router.post('/register', async (req: RegisterRequest, res: Response) => {
   try {
     const { email, password } = req.body
 
-    // Validation
-    if (!email  || !password ) {
-      return res.status(400).json({
-        success: false,
-        message: 'All fields are required'
-      })
+    // 1. Validation (كما هي)
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: 'All fields are required' })
     }
 
-    if (password.length < 4) {
-      return res.status(400).json({
-        success: false,
-        message: 'Password must be at least 4 characters'
-      })
-    }
-
-    // Check if user already exists
+    // 2. Check if user exists (تعديل الـ ?)
     const existingUser = await db.get<User>(
-      'SELECT * FROM users WHERE email = ? ',
+      'SELECT * FROM admins WHERE email = $1', // غيرت users لـ admins والـ ? لـ $1
       [email]
     )
 
-if (existingUser) {
-  return res.status(400).json({
-    success: false,
-    message: 'This email is already registered'
-  })
-}
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: 'This email is already registered' })
+    }
 
-    // Hash password
+    // 3. Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    // Create user
+    // 4. Create user (تعديل الـ ? وإضافة RETURNING id)
     const result = await db.run(
-      'INSERT INTO users (email, password, role) VALUES (?, ?, ?)',
-      [email, hashedPassword, 'user']
+      'INSERT INTO admins (email, password) VALUES ($1, $2) RETURNING id', 
+      [email, hashedPassword]
     )
 
-    // Create JWT token
+    const userId = result.lastID; // دي هتشتغل دلوقتي صح لأننا ضفنا RETURNING id
+
+    // 5. Create JWT token
     const token = jwt.sign(
-      {
-        id: result.lastID,
-        email,
-        role: 'user'
-      },
+      { id: userId, email, role: 'admin' },
       JWT_SECRET,
       { expiresIn: '7d' }
     )
@@ -88,18 +73,11 @@ if (existingUser) {
       success: true,
       message: 'User registered successfully',
       token,
-      user: {
-        id: result.lastID,
-        email,
-        role: 'user'
-      }
+      user: { id: userId, email, role: 'admin' }
     })
   } catch (error) {
-    console.error('Registration error:', error)
-    res.status(500).json({
-      success: false,
-      message: 'Registration failed'
-    })
+    console.error('Registration error:', error) // بص على الـ Terminal هنا لو لسه فيه Error
+    res.status(500).json({ success: false, message: 'Registration failed' })
   }
 })
 
@@ -108,99 +86,36 @@ router.post('/login', async (req: LoginRequest, res: Response) => {
   try {
     const { email, password } = req.body
 
-    // Validation
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email and password are required'
-      })
-    }
-
-    // Find user by email
+    // Find user (تعديل الـ ?)
     const user = await db.get<User>(
-      'SELECT * FROM users WHERE email = ?',
+      'SELECT * FROM admins WHERE email = $1',
       [email]
     )
 
     if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid email or password'
-      })
+      return res.status(401).json({ success: false, message: 'Invalid email or password' })
     }
 
-    // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password)
-
     if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid email or password'
-      })
+      return res.status(401).json({ success: false, message: 'Invalid email or password' })
     }
 
-    // Create JWT token
     const token = jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
-        role: user.role
-      },
+      { id: user.id, email: user.email, role: 'admin' },
       JWT_SECRET,
       { expiresIn: '7d' }
     )
 
     res.json({
       success: true,
-      message: 'Login successful',
       token,
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role
-      }
+      user: { id: user.id, email: user.email, role: 'admin' }
     })
   } catch (error) {
     console.error('Login error:', error)
-    res.status(500).json({
-      success: false,
-      message: 'Login failed'
-    })
+    res.status(500).json({ success: false, message: 'Login failed' })
   }
-})
-
-// Verify token endpoint
-router.post('/verify', (req: Request, res: Response) => {
-  try {
-    const token = req.headers.authorization?.split(' ')[1]
-
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: 'No token provided'
-      })
-    }
-
-    const decoded = jwt.verify(token, JWT_SECRET)
-    res.json({
-      success: true,
-      message: 'Token is valid',
-      user: decoded
-    })
-  } catch (error) {
-    res.status(401).json({
-      success: false,
-      message: 'Invalid token'
-    })
-  }
-})
-
-// Logout endpoint (optional - JWT doesn't need backend logout)
-router.post('/logout', (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    message: 'Logout successful'
-  })
 })
 
 export default router

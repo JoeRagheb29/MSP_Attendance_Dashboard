@@ -21,8 +21,8 @@ export interface Session {
 
 export interface Attendance {
   id: number;
-  memberId: number;
-  sessionId: number;
+  member_id: number;
+  session_id: number;
   status: AttendanceStatus;
   notes?: string;
 }

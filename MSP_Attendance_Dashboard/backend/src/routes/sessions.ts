@@ -7,7 +7,11 @@ const router = express.Router();
 // Get all sessions
 router.get('/', async (req, res) => {
   try {
-    const sessions = await db.all<Session>('SELECT * FROM sessions ORDER BY date DESC, createdAt DESC');
+    // Note: Column names like createdAt are often double-quoted in Postgres 
+    // to preserve case-sensitivity if the table was defined that way.
+    const sessions = await db.all<Session>(
+      'SELECT * FROM sessions ORDER BY date DESC, "created_at" DESC'
+    );
     res.json(sessions);
   } catch (error) {
     console.error('Error fetching sessions:', error);
@@ -19,7 +23,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    const session = await db.get<Session>('SELECT * FROM sessions WHERE id = ?', [id]);
+    const session = await db.get<Session>('SELECT * FROM sessions WHERE id = $1', [id]);
     
     if (!session) {
       return res.status(404).json({ error: 'Session not found' });
@@ -41,15 +45,16 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Session name is required' });
     }
 
-    // Use provided date or current date
     const sessionDate = date || new Date().toISOString();
 
-    const result = await db.run(
-      'INSERT INTO sessions (name, date, createdAt) VALUES (?, ?, datetime("now"))',
-      [name, sessionDate]
-    );
+    // Postgres uses CURRENT_TIMESTAMP and RETURNING * to get the new row immediately
+    const query = `
+      INSERT INTO sessions (name, date, "created_at") 
+      VALUES ($1, $2, CURRENT_TIMESTAMP) 
+      RETURNING *
+    `;
 
-    const newSession = await db.get<Session>('SELECT * FROM sessions WHERE id = ?', [result.lastID]);
+    const newSession = await db.get<Session>(query, [name, sessionDate]);
     res.status(201).json(newSession);
   } catch (error) {
     console.error('Error creating session:', error);
@@ -63,18 +68,21 @@ router.put('/:id', async (req, res) => {
     const id = parseInt(req.params.id);
     const { name, date } = req.body;
 
-    // Check if session exists
-    const existingSession = await db.get<Session>('SELECT * FROM sessions WHERE id = ?', [id]);
-    if (!existingSession) {
+    // We can use RETURNING * here as well to check existence and update in one go
+    const query = `
+      UPDATE sessions 
+      SET name = COALESCE($1, name), 
+          date = COALESCE($2, date) 
+      WHERE id = $3 
+      RETURNING *
+    `;
+
+    const updatedSession = await db.get<Session>(query, [name || null, date || null, id]);
+
+    if (!updatedSession) {
       return res.status(404).json({ error: 'Session not found' });
     }
 
-    await db.run(
-      'UPDATE sessions SET name = COALESCE(?, name), date = COALESCE(?, date) WHERE id = ?',
-      [name || null, date || null, id]
-    );
-
-    const updatedSession = await db.get<Session>('SELECT * FROM sessions WHERE id = ?', [id]);
     res.json(updatedSession);
   } catch (error) {
     console.error('Error updating session:', error);
@@ -87,13 +95,11 @@ router.delete('/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id);
 
-    // Check if session exists
-    const existingSession = await db.get<Session>('SELECT * FROM sessions WHERE id = ?', [id]);
-    if (!existingSession) {
-      return res.status(404).json({ error: 'Session not found' });
-    }
-
-    await db.run('DELETE FROM sessions WHERE id = ?', [id]);
+    // In Postgres, we use $1 as the placeholder
+    const result = await db.run('DELETE FROM sessions WHERE id = $1', [id]);
+    
+    // Most PG drivers return information about how many rows were affected.
+    // If you need to verify it existed, you'd check result.rowCount
     res.status(204).send();
   } catch (error) {
     console.error('Error deleting session:', error);

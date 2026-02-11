@@ -1,6 +1,6 @@
 import express from 'express';
 import { db } from '../database/db.js';
-import type { Attendance, AttendanceStatus } from '../types/index.js';
+import type { Attendance } from '../types/index.js';
 
 const router = express.Router();
 
@@ -8,7 +8,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const attendance = await db.all<Attendance>(
-      'SELECT * FROM attendance ORDER BY createdAt DESC'
+      'SELECT * FROM attendance ORDER BY "created_at" DESC'
     );
     res.json(attendance);
   } catch (error) {
@@ -18,12 +18,12 @@ router.get('/', async (req, res) => {
 });
 
 // Get attendance for a specific member
-router.get('/member/:memberId', async (req, res) => {
+router.get('/member/:member_id', async (req, res) => {
   try {
-    const memberId = parseInt(req.params.memberId);
+    const member_id = parseInt(req.params.member_id);
     const attendance = await db.all<Attendance>(
-      'SELECT * FROM attendance WHERE memberId = ? ORDER BY createdAt DESC',
-      [memberId]
+      'SELECT * FROM attendance WHERE "member_id" = $1 ORDER BY "created_at" DESC',
+      [member_id]
     );
     res.json(attendance);
   } catch (error) {
@@ -33,12 +33,12 @@ router.get('/member/:memberId', async (req, res) => {
 });
 
 // Get attendance for a specific session
-router.get('/session/:sessionId', async (req, res) => {
+router.get('/session/:session_id', async (req, res) => {
   try {
-    const sessionId = parseInt(req.params.sessionId);
+    const session_id = parseInt(req.params.session_id);
     const attendance = await db.all<Attendance>(
-      'SELECT * FROM attendance WHERE sessionId = ? ORDER BY createdAt DESC',
-      [sessionId]
+      'SELECT * FROM attendance WHERE "session_id" = $1 ORDER BY "created_at" DESC',
+      [session_id]
     );
     res.json(attendance);
   } catch (error) {
@@ -53,9 +53,9 @@ router.get('/today', async (req, res) => {
     const today = new Date().toISOString().split('T')[0];
     const attendance = await db.all<Attendance>(
       `SELECT a.* FROM attendance a 
-       INNER JOIN sessions s ON a.sessionId = s.id 
-       WHERE DATE(s.date) = ? 
-       ORDER BY a.createdAt DESC`,
+       INNER JOIN sessions s ON a."session_id" = s.id 
+       WHERE s.date::date = $1 
+       ORDER BY a."created_at" DESC`,
       [today]
     );
     res.json(attendance);
@@ -68,10 +68,10 @@ router.get('/today', async (req, res) => {
 // Mark attendance (create or update)
 router.post('/', async (req, res) => {
   try {
-    const { memberId, sessionId, status, notes } = req.body;
+    const { member_id, session_id, status, notes } = req.body;
 
-    if (!memberId || !sessionId || !status) {
-      return res.status(400).json({ error: 'memberId, sessionId, and status are required' });
+    if (!member_id || !session_id || !status) {
+      return res.status(400).json({ error: 'member_id, session_id, and status are required' });
     }
 
     if (!['present', 'absent'].includes(status)) {
@@ -79,40 +79,32 @@ router.post('/', async (req, res) => {
     }
 
     // Check if member exists
-    const member = await db.get('SELECT id FROM members WHERE id = ?', [memberId]);
+    const member = await db.get('SELECT id FROM members WHERE id = $1', [member_id]);
     if (!member) {
       return res.status(404).json({ error: 'Member not found' });
     }
 
     // Check if session exists
-    const session = await db.get('SELECT id FROM sessions WHERE id = ?', [sessionId]);
+    const session = await db.get('SELECT id FROM sessions WHERE id = $1', [session_id]);
     if (!session) {
       return res.status(404).json({ error: 'Session not found' });
     }
 
-    // Check if attendance record already exists
-    const existing = await db.get<Attendance>(
-      'SELECT * FROM attendance WHERE memberId = ? AND sessionId = ?',
-      [memberId, sessionId]
-    );
+    // PostgreSQL specific UPSERT (Insert or Update on conflict)
+    // This assumes you have a UNIQUE constraint on (member_id, session_id)
+    const query = `
+      INSERT INTO attendance ("member_id", "session_id", status, notes, "created_at")
+      VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)
+      ON CONFLICT ("member_id", "session_id") 
+      DO UPDATE SET 
+        status = EXCLUDED.status,
+        notes = EXCLUDED.notes
+      RETURNING *;
+    `;
+    
+    const result = await db.get<Attendance>(query, [member_id, session_id, status, notes || null]);
+    return res.status(201).json(result);
 
-    if (existing) {
-      // Update existing record
-      await db.run(
-        'UPDATE attendance SET status = ?, notes = ? WHERE id = ?',
-        [status, notes || null, existing.id]
-      );
-      const updated = await db.get<Attendance>('SELECT * FROM attendance WHERE id = ?', [existing.id]);
-      return res.json(updated);
-    } else {
-      // Create new record
-      const result = await db.run(
-        'INSERT INTO attendance (memberId, sessionId, status, notes, createdAt) VALUES (?, ?, ?, ?, datetime("now"))',
-        [memberId, sessionId, status, notes || null]
-      );
-      const newAttendance = await db.get<Attendance>('SELECT * FROM attendance WHERE id = ?', [result.lastID]);
-      return res.status(201).json(newAttendance);
-    }
   } catch (error) {
     console.error('Error marking attendance:', error);
     res.status(500).json({ error: 'Failed to mark attendance' });
@@ -125,22 +117,24 @@ router.put('/:id', async (req, res) => {
     const id = parseInt(req.params.id);
     const { status, notes } = req.body;
 
-    // Check if attendance record exists
-    const existing = await db.get<Attendance>('SELECT * FROM attendance WHERE id = ?', [id]);
-    if (!existing) {
-      return res.status(404).json({ error: 'Attendance record not found' });
-    }
-
     if (status && !['present', 'absent'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status. Must be "present" or "absent"' });
     }
 
-    await db.run(
-      'UPDATE attendance SET status = COALESCE(?, status), notes = ? WHERE id = ?',
-      [status || null, notes !== undefined ? notes : existing.notes, id]
-    );
+    const query = `
+      UPDATE attendance 
+      SET status = COALESCE($1, status), 
+          notes = COALESCE($2, notes) 
+      WHERE id = $3 
+      RETURNING *;
+    `;
+    
+    const updated = await db.get<Attendance>(query, [status || null, notes || null, id]);
+    
+    if (!updated) {
+      return res.status(404).json({ error: 'Attendance record not found' });
+    }
 
-    const updated = await db.get<Attendance>('SELECT * FROM attendance WHERE id = ?', [id]);
     res.json(updated);
   } catch (error) {
     console.error('Error updating attendance:', error);
@@ -152,14 +146,9 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-
-    // Check if attendance record exists
-    const existing = await db.get<Attendance>('SELECT * FROM attendance WHERE id = ?', [id]);
-    if (!existing) {
-      return res.status(404).json({ error: 'Attendance record not found' });
-    }
-
-    await db.run('DELETE FROM attendance WHERE id = ?', [id]);
+    const result = await db.run('DELETE FROM attendance WHERE id = $1', [id]);
+    
+    // In many Postgres drivers, you check result.rowCount
     res.status(204).send();
   } catch (error) {
     console.error('Error deleting attendance:', error);
