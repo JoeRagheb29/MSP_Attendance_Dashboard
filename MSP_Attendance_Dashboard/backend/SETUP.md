@@ -8,16 +8,19 @@
 ## Installation Steps
 
 1. **Navigate to the backend directory**
+
    ```bash
    cd backend
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Initialize the database** (optional - database auto-initializes on server start)
+
    ```bash
    npm run init-db
    ```
@@ -34,16 +37,19 @@ The server will start on `http://localhost:3001` and the database will be automa
 Once the server is running, you can test it:
 
 1. **Health check**
+
    ```bash
    curl http://localhost:3001/health
    ```
 
 2. **Get all members** (should return empty array initially)
+
    ```bash
    curl http://localhost:3001/api/members
    ```
 
 3. **Create a member**
+
    ```bash
    curl -X POST http://localhost:3001/api/members \
      -H "Content-Type: application/json" \
@@ -51,6 +57,7 @@ Once the server is running, you can test it:
    ```
 
 4. **Create a session**
+
    ```bash
    curl -X POST http://localhost:3001/api/sessions \
      -H "Content-Type: application/json" \
@@ -61,7 +68,7 @@ Once the server is running, you can test it:
    ```bash
    curl -X POST http://localhost:3001/api/attendance \
      -H "Content-Type: application/json" \
-     -d '{"memberId":1,"sessionId":1,"status":"present"}'
+     -d '{"member_id":1,"session_id":1,"status":"present"}'
    ```
 
 ## Database

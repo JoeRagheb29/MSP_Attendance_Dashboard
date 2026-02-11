@@ -56,8 +56,8 @@ The server will start on `http://localhost:3001`
 ### Attendance
 
 - `GET /api/attendance` - Get all attendance records
-- `GET /api/attendance/member/:memberId` - Get attendance for a member
-- `GET /api/attendance/session/:sessionId` - Get attendance for a session
+- `GET /api/attendance/member/:member_id` - Get attendance for a member
+- `GET /api/attendance/session/:session_id` - Get attendance for a session
 - `GET /api/attendance/today` - Get today's attendance
 - `POST /api/attendance` - Mark attendance (creates or updates)
 - `PUT /api/attendance/:id` - Update attendance record
@@ -66,6 +66,7 @@ The server will start on `http://localhost:3001`
 ## Database Schema
 
 ### Members Table
+
 - `id` (INTEGER PRIMARY KEY)
 - `name` (TEXT NOT NULL)
 - `category` (TEXT NOT NULL) - 'game' or 'graphics'
@@ -75,19 +76,21 @@ The server will start on `http://localhost:3001`
 - `createdAt` (TEXT)
 
 ### Sessions Table
+
 - `id` (INTEGER PRIMARY KEY)
 - `name` (TEXT NOT NULL)
 - `date` (TEXT NOT NULL)
 - `createdAt` (TEXT)
 
 ### Attendance Table
+
 - `id` (INTEGER PRIMARY KEY)
-- `memberId` (INTEGER NOT NULL) - Foreign key to members
-- `sessionId` (INTEGER NOT NULL) - Foreign key to sessions
+- `member_id` (INTEGER NOT NULL) - Foreign key to members
+- `session_id` (INTEGER NOT NULL) - Foreign key to sessions
 - `status` (TEXT NOT NULL) - 'present' or 'absent'
 - `notes` (TEXT)
 - `createdAt` (TEXT)
-- Unique constraint on (memberId, sessionId)
+- Unique constraint on (member_id, session_id)
 
 ## Development
 
