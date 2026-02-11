@@ -106,11 +106,11 @@ export const memberService = {
   },
 
   // Attendance API
-  // Mark attendance (requires sessionId)
-  markAttendance: async (memberId: number, sessionId: number, status: AttendanceStatus, notes?: string): Promise<Attendance> => {
+  // Mark attendance (requires session_id)
+  markAttendance: async (member_id: number, session_id: number, status: AttendanceStatus, notes?: string): Promise<Attendance> => {
     const response = await api.post('/attendance', {
-      memberId,
-      sessionId,
+      member_id,
+      session_id,
       status,
       notes,
     });
@@ -118,14 +118,14 @@ export const memberService = {
   },
 
   // Get attendance for a member
-  getMemberAttendance: async (memberId: number): Promise<Attendance[]> => {
-    const response = await api.get(`/attendance/member/${memberId}`);
+  getMemberAttendance: async (member_id: number): Promise<Attendance[]> => {
+    const response = await api.get(`/attendance/member/${member_id}`);
     return response.data;
   },
 
   // Get attendance for a session
-  getSessionAttendance: async (sessionId: number): Promise<Attendance[]> => {
-    const response = await api.get(`/attendance/session/${sessionId}`);
+  getSessionAttendance: async (session_id: number): Promise<Attendance[]> => {
+    const response = await api.get(`/attendance/session/${session_id}`);
     return response.data;
   },
 

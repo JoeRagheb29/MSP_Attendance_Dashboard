@@ -1,0 +1,28 @@
+export type Category = 'game' | 'graphics';
+export type AttendanceStatus = 'present' | 'absent';
+export type Role = 'attendee' | 'member' | 'organizer';
+
+export interface Member {
+  id: number;
+  name: string;
+  category: Category;
+  role: Role;
+  email?: string;
+  phone?: string;
+  createdAt: string;
+}
+
+export interface Session {
+  id: number;
+  name: string;
+  date: string;
+  createdAt: string;
+}
+
+export interface Attendance {
+  id: number;
+  member_id: number;
+  session_id: number;
+  status: AttendanceStatus;
+  notes?: string;
+}
