@@ -65,7 +65,7 @@
 // }
 
 
-// src/database/init-server.ts
+// src/database/init-index.ts
 
 import { db } from './db.js'; // أو أي اسم ملف الداتابيز عندك
 

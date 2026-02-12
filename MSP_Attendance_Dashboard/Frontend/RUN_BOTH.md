@@ -11,18 +11,21 @@ npm run dev:all
 ```
 
 This will start both:
+
 - **Backend** on `http://localhost:3001`
 - **Frontend** on `http://localhost:5173` (or another port if 5173 is taken)
 
 ### Option 2: Run Separately (Two Terminals)
 
 **Terminal 1 - Backend:**
+
 ```bash
 cd backend
 npm run dev
 ```
 
 **Terminal 2 - Frontend:**
+
 ```bash
 npm run dev
 ```
@@ -37,6 +40,7 @@ npm run install:all
 ```
 
 Or manually:
+
 ```bash
 # Install frontend dependencies
 npm install
@@ -88,7 +92,7 @@ When running `npm run dev:all`, you'll see output from both servers:
 
 If you see "port already in use" errors:
 
-1. **Backend (3001)**: Change port in `backend/src/server.ts`
+1. **Backend (3001)**: Change port in `backend/src/index.ts`
 2. **Frontend (5173)**: Vite will automatically use the next available port
 
 ### Backend Not Starting
@@ -122,5 +126,6 @@ npm run build:all
 ```
 
 Then:
+
 - Frontend: `npm run preview` (or serve the `dist` folder)
 - Backend: `cd backend && npm start`

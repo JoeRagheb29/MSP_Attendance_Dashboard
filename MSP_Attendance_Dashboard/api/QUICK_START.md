@@ -19,6 +19,7 @@ npm run dev
 ```
 
 You should see:
+
 ```
 ✅ Database tables initialized successfully!
 🚀 Server is running on http://localhost:3001
@@ -41,18 +42,22 @@ Once the server is running, you can test it:
 ## Common Issues
 
 ### "Cannot find module" errors
+
 - Make sure you ran `npm install` in the `backend` folder
 - Delete `node_modules` and `package-lock.json`, then run `npm install` again
 
 ### "Port 3001 already in use"
+
 - Another process is using port 3001
-- Close the other process or change the port in `src/server.ts`
+- Close the other process or change the port in `src/index.ts`
 
 ### "Database error"
+
 - The database will be created automatically
 - If you see errors, delete `attendance.db` and restart the server
 
 ### Server not starting
+
 - Check that Node.js is installed: `node --version` (should be v18+)
 - Check that all dependencies are installed: `npm list`
 

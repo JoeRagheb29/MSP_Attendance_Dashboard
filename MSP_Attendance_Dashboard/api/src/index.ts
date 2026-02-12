@@ -1,13 +1,14 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
-import authRouter from './src/routes/auth.js';
-import membersRouter from './src/routes/members.js';
-import sessionsRouter from './src/routes/sessions.js';
-import attendanceRouter from './src/routes/attendance.js';
-import adminRouter from './src/routes/admin.js';
-import { db } from './src/database/db.js';
-import { initDatabase } from './src/database/init-server.js';
+import authRouter from './routes/auth.js';
+import membersRouter from './routes/members.js';
+import sessionsRouter from './routes/sessions.js';
+import attendanceRouter from './routes/attendance.js';
+import adminRouter from './routes/admin.js';
+import { db } from './database/db.js';
+import { initDatabase } from './database/init-server.js';
+import helmet from 'helmet'; // مكتبة أمان مهمة جداً للـ CV
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -86,23 +87,48 @@ app.use((req, res, next) => {
   next();
 });
 
-if (!isVercel) {
-  const publicPath = path.join(__dirname, '../../public');
-  app.use(express.static(publicPath));
-  app.use('/api/*', (req, res) => {
-    res.status(404).json({ error: 'Route not found' });
-  });
-  app.get('*', (req, res) => {
-    if (req.path.startsWith('/api')) {
-      return res.status(404).json({ error: 'Route not found' });
-    }
-    res.sendFile(path.join(publicPath, 'index.html'));
-  });
-} else {
-  app.use((_req, res) => {
-    res.status(404).json({ error: 'Route not found' });
-  });
-}
+// if (!isVercel) {
+//   const publicPath = path.join(__dirname, '../../public');
+//   app.use(express.static(publicPath));
+//   app.use('/api/*', (req, res) => {
+//     res.status(404).json({ error: 'Route not found' });
+//   });
+//   app.get('*', (req, res) => {
+//     if (req.path.startsWith('/api')) {
+//       return res.status(404).json({ error: 'Route not found' });
+//     }
+//     res.sendFile(path.join(publicPath, 'index.html'));
+//   });
+// } else {
+//   app.use((_req, res) => {
+//     res.status(404).json({ error: 'Route not found' });
+//   });
+// }
+
+
+
+// 1. إعدادات الأمان الأساسية
+app.use(helmet()); 
+app.use(cors({
+  origin: process.env.FRONTEND_URL || '*', 
+  credentials: true
+}));
+app.use(express.json());
+
+// 2. الـ Routes بتاعتك (لازم تكون قبل الـ 404 handler)
+// app.use('/api/auth', authRoutes); 
+
+// 3. اختبار بسيط للتأكد إن الباك شغال (Health Check)
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'Server is running!' });
+});
+
+// 4. الـ 404 Handler الآمن للـ API فقط
+// أي طلب مش بيبدأ بـ /api سيبه لـ Vercel يتعامل معاه من خلال vercel.json
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ error: 'API Route not found' });
+});
+
 
 async function startServer() {
   try {

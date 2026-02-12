@@ -2,12 +2,12 @@
   "name": "msp-attendance-backend",
   "version": "1.0.0",
   "description": "Backend API for MSP Attendance Dashboard",
-  "main": "dist/server.js",
+  "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node dist/index.js",
     "init-db": "tsx src/database/init.ts"
   },
   "keywords": [],
@@ -19,6 +19,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.4",
     "express": "^4.22.1",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.18.0",
     "sqlite3": "^5.0.2"

@@ -86,6 +86,6 @@ npm start
 
 ## Troubleshooting
 
-- **Port already in use**: Change the PORT in `.env` or modify `server.ts`
+- **Port already in use**: Change the PORT in `.env` or modify `index.ts`
 - **Database errors**: Delete `attendance.db` and restart the server to recreate it
 - **Module not found**: Run `npm install` again
