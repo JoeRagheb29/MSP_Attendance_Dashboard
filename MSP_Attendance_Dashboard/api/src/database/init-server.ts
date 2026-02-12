@@ -67,7 +67,7 @@
 
 // src/database/init-server.ts
 
-import { db } from './db'; // أو أي اسم ملف الداتابيز عندك
+import { db } from './db.js'; // أو أي اسم ملف الداتابيز عندك
 
 export const initDatabase = async () => {
   try {

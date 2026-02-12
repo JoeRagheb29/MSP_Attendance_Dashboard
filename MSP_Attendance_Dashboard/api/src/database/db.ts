@@ -18,8 +18,8 @@ if (useTurso) {
   const turso = await import('./db-turso.js');
   db = turso.db;
 } else {
-  const sqlite = await import('./db-postgreSQL.js');
-  db = sqlite.db;
+  const postgreSQL = await import('./db-postgreSQL.js');
+  db = postgreSQL.db;
 }
 
 export { db };
