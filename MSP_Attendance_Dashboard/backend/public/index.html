@@ -219,10 +219,12 @@
     </div>
 
     <script>
-        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-            ? 'http://localhost:3001/api'
-            : '/api';
-        
+        // const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+        //     ? 'http://localhost:3001/api'
+        //     : '/api';
+
+        const API_BASE = 'https://event-attendance-system-iqk5y3aj4-joeragheb29s-projects.vercel.app/api';
+
         async function loadDatabase() {
             const content = document.getElementById('content');
             content.innerHTML = '<div class="loading">Loading database...</div>';

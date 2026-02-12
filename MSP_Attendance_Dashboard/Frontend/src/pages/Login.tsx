@@ -29,7 +29,9 @@ function Login() {
     
     setLoading(true);
 
-    fetch('http://localhost:3001/api/auth/login', {
+    const API_BASE = 'https://event-attendance-system-iqk5y3aj4-joeragheb29s-projects.vercel.app/api';
+
+    fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
       headers: {
         "Content-Type": "application/json",
