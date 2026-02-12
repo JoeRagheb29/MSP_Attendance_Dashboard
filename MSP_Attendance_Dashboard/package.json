@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "install-backend": "cd backend && npm install",
-    "install-frontend": "cd frontend && npm install",
-    "build": "npm run install-backend && npm run install-frontend && cd frontend && npm run build"
+    "install-frontend": "cd Frontend && npm install",
+    "build": "npm run install-backend && npm run install-Frontend && cd Frontend && npm run build"
   },
   "dependencies": {
     "typescript": "^5.0.0"
