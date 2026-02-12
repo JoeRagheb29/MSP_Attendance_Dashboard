@@ -1,8 +1,12 @@
 import pg from 'pg';
+import dotenv from 'dotenv';
+
+dotenv.config(); // دي بتخلي الكود يقرأ ملف الـ .env
+
 const { Pool } = pg;
 
 // الرابط ده هتاخده من Supabase (Settings -> Database -> Connection String)
-const connectionString = "postgresql://postgres.eudevmtgrkyoemqsdebe:GHepM9k792kL9E3j@aws-1-eu-west-1.pooler.supabase.com:5432/postgres";
+const connectionString = process.env.DATABASE_URL ;
 
 class Database {
   private pool: pg.Pool;
