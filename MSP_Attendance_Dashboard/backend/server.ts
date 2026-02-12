@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import authRouter from './src/routes/auth.js';
 import membersRouter from './src/routes/members.js';
 import sessionsRouter from './src/routes/sessions.js';
@@ -10,29 +9,27 @@ import adminRouter from './src/routes/admin.js';
 import { db } from './src/database/db.js';
 import { initDatabase } from './src/database/init-server.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const app = express();
 const PORT = process.env.PORT || 3001;
 const isVercel = process.env.VERCEL === '1';
 
 // CORS configuration to accept requests from any port
 const corsOptions = {
-  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
-    // Allow requests with no origin (mobile apps, curl requests, etc.)
-    if (!origin) {
-      callback(null, true);
-      return;
-    }
-    // Allow any localhost with different ports
-    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
-      callback(null, true);
-      return;
-    }
-    // Allow all origins (for development)
-    callback(null, true);
-  },
+  // origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+  //   // Allow requests with no origin (mobile apps, curl requests, etc.)
+  //   if (!origin) {
+  //     callback(null, true);
+  //     return;
+  //   }
+  //   // Allow any localhost with different ports
+  //   if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+  //     callback(null, true);
+  //     return;
+  //   }
+  //   // Allow all origins (for development)
+  //   callback(null, true);
+  // },
+  origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -80,6 +77,13 @@ app.use('/api/auth', authRouter);
 app.use((err: unknown, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Error:', err);
   res.status(500).json({ error: 'Internal server error' });
+});
+
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
 });
 
 if (!isVercel) {
