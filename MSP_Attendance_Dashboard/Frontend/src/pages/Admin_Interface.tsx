@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import type { Member, Attendance, Session } from '../../../backend/src/types'
+import type { Member, Attendance, Session } from '../../../api/src/types'
 import { memberService } from '../api/memberService'
 import { MemberList } from '../components/MemberList'
 import { AddMember } from '../components/AddMember'

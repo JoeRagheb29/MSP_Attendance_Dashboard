@@ -1,13 +1,13 @@
 {
   "version": 2,
-"rewrites": [
+  "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "backend/src/server.ts"
+      "destination": "/api/src/index.ts"
     },
     {
       "source": "/(.*)",
-      "destination": "/Frontend/dist/$1"
+      "destination": "/Frontend/$1"
     }
   ]
 }

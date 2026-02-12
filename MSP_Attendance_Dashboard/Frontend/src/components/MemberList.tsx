@@ -1,5 +1,5 @@
 import { FiEdit2, FiTrash2, FiCheck, FiX } from 'react-icons/fi'
-import type { Member } from '../../../backend/src/types'
+import type { Member } from '../../../api/src/types'
 import { useTheme } from '../context/useTheme'
 
 interface MemberListProps {
