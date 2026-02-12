@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "install-backend": "cd backend && npm install",
-    "install-frontend": "cd Frontend && npm install",
+    "install-Frontend": "cd Frontend && npm install",
     "build": "npm run install-backend && npm run install-Frontend && cd Frontend && npm run build"
   },
   "dependencies": {
