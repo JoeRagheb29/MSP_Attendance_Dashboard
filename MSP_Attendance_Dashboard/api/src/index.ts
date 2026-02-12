@@ -26,14 +26,11 @@ const allowedOrigins = allowedFromEnv
 
 console.log('Allowed CORS origins:', allowedOrigins.join(', '));
 
-// CORS options
+// TEMPORARY — open CORS completely for testing
+// WARNING: this allows requests from any origin. Remove/lock down before production.
 const corsOptions = {
-  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    if (!origin) return callback(null, true); // allow server-to-server or curl
-    if (origin.includes('localhost') || origin.includes('127.0.0.1')) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    callback(new Error('Not allowed by CORS'));
-  },
+  // `origin: true` will reflect the request Origin header — allows all origins
+  origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -43,7 +40,8 @@ const corsOptions = {
 app.use(helmet());
 app.use(express.json());
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+// handle preflight requests for all routes
+app.options('*', cors());
 
 // Health checks
 app.get('/health', (_req, res) => res.json({ status: 'ok', message: 'MSP Attendance API is running' }));
