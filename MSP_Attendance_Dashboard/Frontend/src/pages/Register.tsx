@@ -31,7 +31,8 @@ function Register() {
 
     setLoading(true);
 
-    const API_BASE = 'https://event-attendance-system-iqk5y3aj4-joeragheb29s-projects.vercel.app/api';
+    // Use Vite env var VITE_API_BASE when available, otherwise fall back to localhost for dev
+    const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://localhost:3000/api';
 
     fetch(`${API_BASE}/auth/register`, {
       method: 'POST',
@@ -71,36 +72,6 @@ function Register() {
 
 
   return (
-    // <div className={`hero-container flex flex-col items-center justify-center min-h-screen bg-linear-to-r ${isDarkMode ? 'to-black' : 'to-white'} from-indigo-800 p-4 space-y-8`}>
-    //   <button onClick={toggleDarkMode}
-    //     className={`absolute top-10 right-10 gap-2 px-4 py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl whitespace-nowrap ${
-    //       isDarkMode 
-    //         ? 'bg-gray-700 text-yellow-400 hover:bg-gray-600' 
-    //         : 'bg-gray-800 text-yellow-300 hover:bg-gray-700'
-    //     }`} title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-    //   >
-    //     {isDarkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
-    //   </button>
-    //   <div className="content text-center mr-10 ">
-    //     <h1 className='text-3xl font-bold text-gray-100 w-2xl'>Create a New Admin Account</h1>
-    //     <p className="text-gray-300">Fill in the details below to register.</p>
-    //   </div>
-    //   <div className="Registration bg-gray-100 p-6 rounded-lg shadow-lg flex flex-col items-center space-y-4">
-    //     <form className="Login flex flex-col space-y-4">
-    //       {error && <p className="text-red-600"> {error} </p>}
-    //       <Input type="email" placeholder="Enter Email Address" name="email" id="email" 
-    //        onChange={handleInputChange} />
-
-    //       <Input type="password" placeholder="Enter Password" name="password" id="password"
-    //        onChange={handleInputChange} />
-
-    //       <Input type="password" placeholder="Confirm Password" name="confirmPassword" id="confirmPassword"
-    //        onChange={handleInputChange} />
-
-    //       <button className='bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all' disabled={loading} onClick={handleRegister}>{loading ? "...loading" : "Register"}</button>
-    //     </form>
-    //   </div>
-    // </div>
 
 
 <div className={`min-h-screen transition-colors duration-300 ${
@@ -197,4 +168,5 @@ function Register() {
 }
 
 export default Register
+
 

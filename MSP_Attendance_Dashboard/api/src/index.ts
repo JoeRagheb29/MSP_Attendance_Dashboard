@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import path from 'path';
 import authRouter from './routes/auth.js';
 import membersRouter from './routes/members.js';
 import sessionsRouter from './routes/sessions.js';
@@ -8,45 +7,50 @@ import attendanceRouter from './routes/attendance.js';
 import adminRouter from './routes/admin.js';
 import { db } from './database/db.js';
 import { initDatabase } from './database/init-server.js';
-import helmet from 'helmet'; // مكتبة أمان مهمة جداً للـ CV
+import helmet from 'helmet';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config({ path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env' });
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const isVercel = process.env.VERCEL === '1';
+const isVercel = process.env.VERCEL === '1' || process.env.VERCEL === 'true';
 
-// CORS configuration to accept requests from any port
+// Allowed origins — prefer explicit env var, fallback to known dev/prod origins
+const defaultFrontend = 'https://event-attendance-system-6Sav2htRa-joeragheb29s-projects.vercel.app';
+const allowedFromEnv = process.env.CORS_ORIGIN || process.env.FRONTEND_URL || '';
+const allowedOrigins = allowedFromEnv
+  ? allowedFromEnv.split(',').map(s => s.trim()).filter(Boolean)
+  : [defaultFrontend, 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5173', 'http://127.0.0.1:5173'];
+
+console.log('Allowed CORS origins:', allowedOrigins.join(', '));
+
+// CORS options
 const corsOptions = {
-  // origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
-  //   // Allow requests with no origin (mobile apps, curl requests, etc.)
-  //   if (!origin) {
-  //     callback(null, true);
-  //     return;
-  //   }
-  //   // Allow any localhost with different ports
-  //   if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
-  //     callback(null, true);
-  //     return;
-  //   }
-  //   // Allow all origins (for development)
-  //   callback(null, true);
-  // },
-  origin: true,
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    if (!origin) return callback(null, true); // allow server-to-server or curl
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
-app.use(cors(corsOptions));
+// Middlewares (order matters)
+app.use(helmet());
 app.use(express.json());
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
-function healthResponse(res: express.Response) {
-  res.json({ status: 'ok', message: 'MSP Attendance API is running' });
-}
+// Health checks
+app.get('/health', (_req, res) => res.json({ status: 'ok', message: 'MSP Attendance API is running' }));
+app.get('/api/health', (_req, res) => res.json({ status: 'ok', message: 'Server is running!' }));
 
-app.get('/health', (req, res) => healthResponse(res));
-app.get('/api/health', (req, res) => healthResponse(res));
-
-app.get('/api', (req, res) => {
+// Root info
+app.get('/api', (_req, res) => {
   res.json({
     message: 'MSP Attendance API',
     version: '1.0.0',
@@ -65,70 +69,27 @@ app.get('/api', (req, res) => {
   });
 });
 
-app.post('/api/form', async (req, res) => {
-  res.sendStatus(200);
-});
+// Simple form endpoint
+app.post('/api/form', async (_req, res) => res.sendStatus(200));
 
+// API routes
 app.use('/api/members', membersRouter);
 app.use('/api/sessions', sessionsRouter);
 app.use('/api/attendance', attendanceRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/auth', authRouter);
 
-app.use((err: unknown, req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error('Error:', err);
+// Error handling
+app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error('Server error:', err && (err as Error).message ? (err as Error).message : err);
+  if (err instanceof Error && err.message === 'Not allowed by CORS') {
+    return res.status(403).json({ error: 'CORS Error: origin not allowed' });
+  }
   res.status(500).json({ error: 'Internal server error' });
 });
 
-app.use((req, res, next) => {
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-  next();
-});
-
-// if (!isVercel) {
-//   const publicPath = path.join(__dirname, '../../public');
-//   app.use(express.static(publicPath));
-//   app.use('/api/*', (req, res) => {
-//     res.status(404).json({ error: 'Route not found' });
-//   });
-//   app.get('*', (req, res) => {
-//     if (req.path.startsWith('/api')) {
-//       return res.status(404).json({ error: 'Route not found' });
-//     }
-//     res.sendFile(path.join(publicPath, 'index.html'));
-//   });
-// } else {
-//   app.use((_req, res) => {
-//     res.status(404).json({ error: 'Route not found' });
-//   });
-// }
-
-
-
-// 1. إعدادات الأمان الأساسية
-app.use(helmet()); 
-app.use(cors({
-  origin: process.env.FRONTEND_URL || '*', 
-  credentials: true
-}));
-app.use(express.json());
-
-// 2. الـ Routes بتاعتك (لازم تكون قبل الـ 404 handler)
-// app.use('/api/auth', authRoutes); 
-
-// 3. اختبار بسيط للتأكد إن الباك شغال (Health Check)
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok', message: 'Server is running!' });
-});
-
-// 4. الـ 404 Handler الآمن للـ API فقط
-// أي طلب مش بيبدأ بـ /api سيبه لـ Vercel يتعامل معاه من خلال vercel.json
-app.use('/api/*', (req, res) => {
-  res.status(404).json({ error: 'API Route not found' });
-});
-
+// 404 handler for API
+app.use('/api/*', (_req, res) => res.status(404).json({ error: 'API Route not found' }));
 
 async function startServer() {
   try {
@@ -155,6 +116,9 @@ if (!isVercel) {
     await db.close();
     process.exit(0);
   });
+} else {
+  // Vercel / serverless: export app and let platform handle the listener
+  app.use((_req, res) => res.status(404).json({ error: 'Route not found' }));
 }
 
 export default app;

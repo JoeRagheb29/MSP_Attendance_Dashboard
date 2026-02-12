@@ -27,8 +27,8 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.code === 'ECONNREFUSED' || error.message.includes('Network Error')) {
-      console.error('[API] Connection refused. Is the backend server running on http://localhost:3001?');
-      error.message = 'Cannot connect to backend server. Make sure the backend is running on http://localhost:3001';
+      console.error('[API] Connection refused. Is the backend server running on http://localhost:3000?');
+      error.message = 'Cannot connect to backend server. Make sure the backend is running on http://localhost:3000';
     } else if (error.code === 'ETIMEDOUT') {
       console.error('[API] Request timeout. The server might be slow or not responding.');
       error.message = 'Request timeout. The backend server might be slow or not responding.';

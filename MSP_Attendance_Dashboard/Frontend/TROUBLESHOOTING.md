@@ -124,7 +124,7 @@ The improved error handling will show:
 Run this in your browser console (F12):
 
 ```javascript
-fetch("http://localhost:3001/health")
+fetch("http://localhost:3000/health")
   .then((r) => r.json())
   .then(console.log)
   .catch(console.error);

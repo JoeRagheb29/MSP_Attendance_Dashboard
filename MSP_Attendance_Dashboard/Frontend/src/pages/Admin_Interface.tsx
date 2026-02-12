@@ -239,7 +239,7 @@ function App() {
             <p className="font-bold mb-2 underline">Troubleshooting steps:</p>
             <ul className="list-disc list-inside space-y-1 ml-2 opacity-90">
               <li>Server status: <code className="bg-gray-800 text-pink-400 px-1 rounded">npm run dev:all</code></li>
-              <li>Endpoint: <code className="bg-gray-800 text-pink-400 px-1 rounded">localhost:3001/health</code></li>
+              <li>Endpoint: <code className="bg-gray-800 text-pink-400 px-1 rounded">localhost:3000/health</code></li>
               <li>Check browser console (F12)</li>
             </ul>
           </div>
