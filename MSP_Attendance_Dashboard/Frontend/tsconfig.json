@@ -5,16 +5,17 @@
     { "path": "./tsconfig.node.json" }
   ],
 
-  "compilerOptions": {
-    "types": ["node"],
-    "jsx": "react-jsx", // أو "react" لو شغال نسخة قديمة
-    "module": "ESNext",
-    "target": "ESNext",
-    "moduleResolution": "node",
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true
-
-  }
+  // "compilerOptions": {
+  //   "types": ["node"],
+  //   "jsx": "react-jsx", // أو "react" لو شغال نسخة قديمة
+  //   "module": "ESNext",
+  //   "target": "ESNext",
+  //   "moduleResolution": "node",
+  //   "allowJs": true,
+  //   "skipLibCheck": true,
+  //   "esModuleInterop": true,
+  //   "forceConsistentCasingInFileNames": true,
+  //   "strict": true,
+  // }
 
 }
