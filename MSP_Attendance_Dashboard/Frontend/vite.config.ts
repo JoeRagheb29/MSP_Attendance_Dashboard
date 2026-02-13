@@ -10,4 +10,8 @@ export default defineConfig({
       '/health': { target: 'http://localhost:3000', changeOrigin: true },
     },
   },
+  build: {
+    // bump the warning threshold so large vendor chunks don't fail the build on CI
+    chunkSizeWarningLimit: 1200, // in KB
+  },
 })
