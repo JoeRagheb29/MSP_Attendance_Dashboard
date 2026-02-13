@@ -18,13 +18,13 @@ const PORT = process.env.PORT || 3001;
 const isVercel = process.env.VERCEL === '1' || process.env.VERCEL === 'true';
 
 // Allowed origins — prefer explicit env var, fallback to known dev/prod origins
-const defaultFrontend = 'https://event-attendance-system-joeragheb29s-projects.vercel.app/';
-const allowedFromEnv = process.env.CORS_ORIGIN || process.env.FRONTEND_URL || '';
-const allowedOrigins = allowedFromEnv
-  ? allowedFromEnv.split(',').map(s => s.trim()).filter(Boolean)
-  : [defaultFrontend, 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5173', 'http://127.0.0.1:5173'];
+// const defaultFrontend = 'https://event-attendance-system-joeragheb29s-projects.vercel.app/';
+// const allowedFromEnv = process.env.CORS_ORIGIN || process.env.FRONTEND_URL || '';
+// const allowedOrigins = allowedFromEnv
+//   ? allowedFromEnv.split(',').map(s => s.trim()).filter(Boolean)
+//   : [defaultFrontend, 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5173', 'http://127.0.0.1:5173'];
 
-console.log('Allowed CORS origins:', allowedOrigins.join(', '));
+// console.log('Allowed CORS origins:', allowedOrigins.join(', '));
 
 // TEMPORARY — open CORS completely for testing
 // WARNING: this allows requests from any origin. Remove/lock down before production.
@@ -65,7 +65,7 @@ app.get('/api', (_req, res) => {
       },
     },
   });
-});
+}); 
 
 // Simple form endpoint
 app.post('/api/form', async (_req, res) => res.sendStatus(200));

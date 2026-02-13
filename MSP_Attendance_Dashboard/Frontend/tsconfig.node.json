@@ -3,14 +3,13 @@
     "composite": true,
     "skipLibCheck": true,
     "module": "ESNext",
-    "moduleResolution": "bundler",          // أو "node16" / "nodenext" لو لسه مش شغال
+    "moduleResolution": "bundler",          
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "types": ["node"]                       // مهم لـ process.env إلخ
+    "types": ["node"]                  
   },
   "include": [
     "vite.config.ts",
-    "vite.config.mts"   // لو بتستخدم .mts
+    "vite.config.mts"
   ]
 }
-

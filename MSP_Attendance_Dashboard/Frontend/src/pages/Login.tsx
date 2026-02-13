@@ -30,7 +30,7 @@ function Login() {
     setLoading(true);
 
     // Use Vite env var VITE_API_BASE when available; otherwise default to deployed backend
-    const API_BASE = import.meta.env.VITE_API_BASE ?? 'https://event-attendance-system-joeragheb29s-projects.vercel.app/api';
+    const API_BASE = import.meta.env.VITE_API_BASE ?? 'https://msp-attendance-dashboard-j8k1.vercel.app/api';
 
     fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
