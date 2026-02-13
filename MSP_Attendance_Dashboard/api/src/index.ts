@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 3001;
 const isVercel = process.env.VERCEL === '1' || process.env.VERCEL === 'true';
 
 // Allowed origins — prefer explicit env var, fallback to known dev/prod origins
-const defaultFrontend = 'https://event-attendance-system-6Sav2htRa-joeragheb29s-projects.vercel.app';
+const defaultFrontend = 'https://event-attendance-system-joeragheb29s-projects.vercel.app/';
 const allowedFromEnv = process.env.CORS_ORIGIN || process.env.FRONTEND_URL || '';
 const allowedOrigins = allowedFromEnv
   ? allowedFromEnv.split(',').map(s => s.trim()).filter(Boolean)
