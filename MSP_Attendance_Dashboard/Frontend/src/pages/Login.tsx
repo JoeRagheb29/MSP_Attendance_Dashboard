@@ -29,8 +29,8 @@ function Login() {
     
     setLoading(true);
 
-    // Use Vite env var VITE_API_BASE when available, otherwise fall back to localhost for dev
-    const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://localhost:3000/api';
+    // Use Vite env var VITE_API_BASE when available; otherwise default to deployed backend
+    const API_BASE = import.meta.env.VITE_API_BASE ?? 'https://event-attendance-system-joeragheb29s-projects.vercel.app/api';
 
     fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
