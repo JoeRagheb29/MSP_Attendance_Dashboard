@@ -38,25 +38,30 @@ function NavBar({
               </div>
             </div>
             <div className="flex gap-3 items-center">
-              <button 
+              <button
                 onClick={toggleDarkMode}
-                className={`flex items-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl whitespace-nowrap ${
-                  isDarkMode 
-                    ? 'bg-gray-700 text-yellow-400 hover:bg-gray-600' 
+                className={`flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl whitespace-nowrap ${
+                  isDarkMode
+                    ? 'bg-gray-700 text-yellow-400 hover:bg-gray-600'
                     : 'bg-gray-800 text-yellow-300 hover:bg-gray-700'
                 }`}
                 title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                aria-label={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
               >
                 {isDarkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
               </button>
-              <button onClick={handleAddClick}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl whitespace-nowrap ${
+              <button
+                onClick={handleAddClick}
+                className={`flex items-center gap-2 px-3 py-2 sm:px-6 sm:py-3 rounded-lg font-semibold hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl whitespace-nowrap ${
                   isDarkMode
                     ? 'bg-indigo-600 text-white hover:bg-indigo-700'
                     : 'bg-white text-indigo-700 hover:bg-indigo-50'
                 }`}
+                aria-label="Add member"
+                title="Add member"
               >
-                <FiPlus size={20} /> Add Member
+                <FiPlus size={20} />
+                <span className="hidden sm:inline">Add Member</span>
               </button>
             </div>
           </div>
