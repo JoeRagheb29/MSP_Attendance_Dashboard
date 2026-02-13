@@ -1,7 +1,13 @@
 import axios from "axios";
 import type { Member, Attendance, Session, Category, AttendanceStatus } from '../types';
 
-const API_BASE = '/api';
+// Prefer explicit Vite env variable VITE_API_BASE.
+// If not set, default to localhost in development and the deployed backend in production.
+const DEFAULT_DEPLOYED = 'https://msp-attendance-dashboard-j8k1.vercel.app/api';
+const viteEnv = import.meta.env as ImportMetaEnv & { MODE?: string };
+const API_BASE = viteEnv.VITE_API_BASE ?? (viteEnv.MODE === 'development' ? 'http://localhost:3000/api' : DEFAULT_DEPLOYED);
+
+console.log("API_BASE:", API_BASE);
 
 const api = axios.create({
   baseURL: API_BASE,
@@ -26,9 +32,10 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
+    const apiOrigin = API_BASE.replace(/\/api\/?$/, '');
     if (error.code === 'ECONNREFUSED' || error.message.includes('Network Error')) {
-      console.error('[API] Connection refused. Is the backend server running on http://localhost:3000?');
-      error.message = 'Cannot connect to backend server. Make sure the backend is running on http://localhost:3000';
+      console.error(`[API] Connection refused. Is the backend server running at ${apiOrigin}?`);
+      error.message = `Cannot connect to backend server. Make sure the backend is running at ${apiOrigin}`;
     } else if (error.code === 'ETIMEDOUT') {
       console.error('[API] Request timeout. The server might be slow or not responding.');
       error.message = 'Request timeout. The backend server might be slow or not responding.';
@@ -39,7 +46,7 @@ api.interceptors.response.use(
     } else if (error.request) {
       // Request was made but no response received
       console.error('[API] No response received from server');
-      error.message = 'No response from server. Check if the backend is running.';
+      error.message = `No response from server at ${API_BASE}. Check if the backend is running.`;
     }
     return Promise.reject(error);
   }

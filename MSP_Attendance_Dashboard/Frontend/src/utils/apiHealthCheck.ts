@@ -3,7 +3,7 @@
  */
 export async function checkApiHealth(): Promise<boolean> {
   try {
-    const response = await fetch('/api/health', {
+    const response = await fetch('https://msp-attendance-dashboard-j8k1.vercel.app/api/health', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

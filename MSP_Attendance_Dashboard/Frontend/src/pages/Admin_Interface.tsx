@@ -38,7 +38,7 @@ function App() {
       // First check if the API is accessible
       const isHealthy = await checkApiHealth()
       if (!isHealthy) {
-        setError('Cannot connect to backend server. Please make sure the backend is running on https://event-attendance-system-iqk5y3aj4-joeragheb29s-projects.vercel.app/api')
+        setError('Cannot connect to backend server. Please make sure the backend is running on https://msp-attendance-dashboard-j8k1.vercel.app/')
         setLoading(false)
         return
       }

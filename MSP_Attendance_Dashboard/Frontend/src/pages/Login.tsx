@@ -30,7 +30,18 @@ function Login() {
     setLoading(true);
 
     // Use Vite env var VITE_API_BASE when available; otherwise default to deployed backend
-    const API_BASE = import.meta.env.VITE_API_BASE ?? 'https://msp-attendance-dashboard-j8k1.vercel.app/api';
+    // const API_BASE = import.meta.env.VITE_API_BASE ?? 'https://msp-attendance-dashboard-j8k1.vercel.app/api';
+
+// Prefer explicit Vite env variable VITE_API_BASE.
+// If not set, default to localhost in development and the deployed backend in production.
+const DEFAULT_DEPLOYED = 'https://msp-attendance-dashboard-j8k1.vercel.app/api';
+const viteEnv = import.meta.env as ImportMetaEnv & { MODE?: string };
+const API_BASE = viteEnv.VITE_API_BASE ?? (viteEnv.MODE === 'development' ? 'http://localhost:3000/api' : DEFAULT_DEPLOYED);
+
+console.log("API_BASE:", API_BASE);
+
+
+
 
     fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
@@ -56,39 +67,6 @@ function Login() {
 
   return (
     <>
-    {/* <div className={`hero-container flex flex-row items-center justify-center min-h-screen bg-linear-to-r ${isDarkMode ? 'to-black' : 'to-white'} from-indigo-800 p-4 space-y-8`}>
-      <button onClick={toggleDarkMode}
-        className={`absolute top-10 right-10 gap-2 px-4 py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl whitespace-nowrap ${
-          isDarkMode 
-            ? 'bg-gray-700 text-yellow-400 hover:bg-gray-600' 
-            : 'bg-gray-800 text-yellow-300 hover:bg-gray-700'
-        }`} title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-      >
-        {isDarkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
-      </button>
-      <div className="content flex flex-row text-center mr-10">
-            <img src={logo} alt="Logo" className="mx-auto w-24 mb-4 mr-8" />
-            <div className="text-left">
-            <h1 className='text-3xl font-bold text-white w-2xl'>Welcome to your <br/> Attendance Management System</h1>
-            <p>Track and manage attendance efficiently.</p>
-            </div>
-      </div>
-      <div className="Registration bg-gray-200 p-6 rounded-lg shadow-lg flex flex-col items-center space-y-4">
-            <form action="/login" method='post' className="Login flex flex-col space-y-4">
-                  {error && <p className="text-red-500">{error}</p>}
-                  <input className={`px-4 py-2.5 border rounded-lg shadow-sm hover:shadow-md placeholder:opacity-40 placeholder:font-normal`} 
-                  onChange={handleInputChange} type="email" placeholder="Enter Email Address" name="email" id="email" />
-
-                  <input className={`px-4 py-2.5 border rounded-lg shadow-sm hover:shadow-md placeholder:opacity-40 placeholder:font-normal`} 
-                  onChange={handleInputChange} type="password" placeholder="Enter Password" name="password" id="password" />
-
-                  <button onClick={handleLogin} className='bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all' type="submit">Log In</button>
-            </form>
-            <div className="line bg-gray-500 w-full h-px my-4"></div>
-
-            <Link className='m-2.5 text-lg text-indigo-500 hover:underline' to="/register">Create New Admin Account</Link>
-      </div>
-    </div> */}
 
   <div className={`min-h-screen transition-colors duration-300 flex flex-col md:flex-row items-center justify-center p-6 gap-12 ${
   isDarkMode 
