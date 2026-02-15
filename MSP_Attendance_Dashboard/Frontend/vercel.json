@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run install:all && npm run build:all",
+  "buildCommand": "npm run install && npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
