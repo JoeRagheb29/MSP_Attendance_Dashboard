@@ -1,8 +1,5 @@
 {
-  "buildCommand": "npm run install:all && npm run build:all",
+  "buildCommand": "npm install && npm run build",
   "outputDirectory": "dist",
-  "framework": "vite",
-  "rewrites": [
-    { "source": "/health", "destination": "/api/health" }
-  ]
+  "framework": "vite"
 }
