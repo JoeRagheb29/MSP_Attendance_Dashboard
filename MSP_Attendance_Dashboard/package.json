@@ -2,15 +2,11 @@
   "name": "attendance-system-root",
   "version": "1.0.0",
   "scripts": {
-    "install-backend": "cd backend && npm install",
-    "install-Frontend": "cd Frontend && npm install",
-    "build": "npm run install-backend && npm run install-Frontend && cd Frontend && npm run build",
     "install:all": "cd Frontend && npm install",
-    "build:all": "cd Frontend && npm install && npm run build"
+    "build:all": "cd Frontend && npm run build",
+    "build": "npm run install:all && npm run build:all"
   },
-  "dependencies": {
+  "devDependencies": {
     "typescript": "^5.0.0"
   }
 }
-
-
