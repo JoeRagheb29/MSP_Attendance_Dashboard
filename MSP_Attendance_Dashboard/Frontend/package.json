@@ -7,7 +7,7 @@
     "dev": "vite",
     "dev:backend": "npm run dev",
     "dev:all": "concurrently \"npm run dev:api\" \"npm run dev\"",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
     "build:backend": "npm run build",
     "build:all": "npm run build",
     "lint": "eslint .",
