@@ -5,12 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:all": "concurrently \"npm run dev:api\" \"npm run dev\"",
     "build": "vite build",
-    "build:all": "npm run build",
-    "lint": "eslint .",
     "preview": "vite preview",
-    "install:all": "npm install",
+    "lint": "eslint .",
     "start": "npm run dev"
   },
   "dependencies": {
@@ -20,7 +17,6 @@
     "react-hot-toast": "^2.6.0",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.13.0",
-    "sqlite3": "^5.0.2",
     "toast": "^0.5.4"
   },
   "devDependencies": {
@@ -31,7 +27,6 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "autoprefixer": "^10.4.23",
-    "concurrently": "^8.2.2",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
