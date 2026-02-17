@@ -6,7 +6,9 @@
     "moduleResolution": "bundler",          
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "types": ["node"]                  
+    "types": ["node"],
+    // ensure TS looks in local node_modules/@types
+    "typeRoots": ["./node_modules/@types"]                
   },
   "include": [
     "vite.config.ts",

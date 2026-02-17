@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { Member, Attendance, Session, Category, AttendanceStatus } from '../types';
 
-const API_BASE = '/api';
+const API_BASE = 'https://msp-attendance-dashboard-j8k1.vercel.app/api';
 
 const api = axios.create({
   baseURL: API_BASE,
