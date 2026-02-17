@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
 
-interface ThemeContextType {
+export interface ThemeContextType {
   isDarkMode: boolean
   toggleDarkMode: () => void
 }
