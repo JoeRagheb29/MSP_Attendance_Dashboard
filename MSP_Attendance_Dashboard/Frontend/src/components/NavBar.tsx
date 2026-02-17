@@ -1,6 +1,8 @@
 import { FiPlus, FiSearch, FiMoon, FiSun } from 'react-icons/fi'
 import logo from '../assets/logo.jpg'
+import angleDown from '../assets/angle-down-solid-full.svg'
 import { useTheme } from '../context/useTheme'
+import { useState } from 'react'
 
 interface NavBarProps {
   handleAddClick: () => void
@@ -22,6 +24,8 @@ function NavBar({
   onSearchChange = () => {},
 }: NavBarProps) {
   const { isDarkMode, toggleDarkMode } = useTheme()
+  // fixed typo and keep collapsed by default on very small screens (toggle visible on mobile)
+  const [collapseOpen, setCollapseOpen] = useState(true);
 
   return (
     <div>
@@ -30,7 +34,7 @@ function NavBar({
         <div className="max-w-6xl mx-auto px-2 sm:px-4 lg:px-6 py-6">
           {/* Top Row - Logo and Add Button */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-6">
-            <div className="flex-1 flex items-center gap-4">
+            <div className="flex-1 flex-col text-center sm:flex-row flex items-center gap-4">
               <img src={logo} alt="MSP Logo" className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg shadow-lg" />
               <div>
                 <h1 className="text-4xl font-bold tracking-tight mb-2">MSP Attendance System</h1>
@@ -63,32 +67,38 @@ function NavBar({
                 <FiPlus size={20} />
                 <span className="hidden sm:inline">Add Member</span>
               </button>
+              {/* collapse toggle: visible on mobile only, rotates when open */}
+              <button
+                className="sm:hidden flex items-center justify-center p-2 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition-transform"
+                onClick={() => setCollapseOpen(!collapseOpen)}
+              >
+                <img
+                  src={angleDown}
+                  alt="Toggle Collapse"
+                  className={`w-6 h-6 transform transition-transform duration-300 ${collapseOpen ? 'rotate-180' : 'rotate-0'}`}
+                />
+              </button>
             </div>
           </div>
-
-          {/* Bottom Row - Search and Filter */}
-          <div className="flex flex-col sm:flex-row gap-4 items-center">
-            {/* Search Input */}
+          <div id="navbar-collapse"
+            className={`overflow-hidden transition-all duration-300
+              ${collapseOpen ? 'max-h-96 opacity-100 py-2' : 'max-h-0 opacity-0 py-0'}
+              sm:max-h-none sm:opacity-100 sm:py-0 sm:overflow-visible
+              flex flex-col sm:flex-row gap-4 items-center`}
+          >
             <div className={`flex-1 relative rounded-xl shadow-md ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-              <FiSearch className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} size={20} />
-              <input
-                type="text"
-                placeholder="Search member by name..."
-                value={searchQuery}
+              <FiSearch className={`absolute left-3 top-1/2 transform -translate-y-1/2 
+                ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} size={20} 
+                />
+              <input type="text" placeholder="Search member by name..." value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 className={`w-full pl-10 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-md ${
                   isDarkMode
                     ? 'bg-gray-800 text-white placeholder-gray-500 border border-gray-700'
                     : 'bg-white text-gray-900 placeholder-gray-800'
-                }`}
-              />
+                }`}/>
             </div>
-
-            {/* Category Filter */}
-            <select
-              title="Filter by category"
-              value={selectedCategory}
-              onChange={(e) => onCategoryChange(e.target.value)}
+            <select title="Filter by category" value={selectedCategory} onChange={(e) => onCategoryChange(e.target.value)}
               className={`px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-md min-w-fit font-semibold ${
                 isDarkMode
                   ? 'bg-gray-800 text-white border border-gray-700'
@@ -99,12 +109,7 @@ function NavBar({
               <option value="game">🎮 Game</option>
               <option value="graphics">🎨 Graphics</option>
             </select>
-
-            {/* Role Filter */}
-            <select
-              title="Filter by role"
-              value={selectedRole}
-              onChange={(e) => onRoleChange(e.target.value)}
+            <select title="Filter by role" value={selectedRole} onChange={(e) => onRoleChange(e.target.value)}
               className={`px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-md min-w-fit font-semibold ${
                 isDarkMode
                   ? 'bg-gray-800 text-white border border-gray-700'
