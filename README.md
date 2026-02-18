@@ -9,7 +9,7 @@ This repository includes a React + TypeScript frontend and an Express + TypeScri
 ## Quick overview
 
 - Frontend: `Frontend/` — React, TypeScript, Vite, Tailwind
-- Backend: `api/` (package.json present) and sources under `backend/src/` — Express, TypeScript, SQLite
+- Backend: `api/` (package.json present) and sources under `backend/src/` — Express, TypeScript, postgreSQL
 - Purpose: CRUD for members/sessions, per-session attendance, role-based filtering, admin reporting
 
 ---
