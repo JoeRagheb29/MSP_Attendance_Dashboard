@@ -31,10 +31,18 @@ interface User {
   createdAt: string
 }
 
+router.get('/register', (req: Request, res: Response) => {
+  res.json({ message: 'Register endpoint is working' })
+})
+
+
 // Register endpoint
 router.post('/register', async (req: RegisterRequest, res: Response) => {
   try {
     const { email, password } = req.body
+
+    console.log("email:", email)
+    console.log("password:", password)
 
     // 1. Validation (كما هي)
     if (!email || !password) {

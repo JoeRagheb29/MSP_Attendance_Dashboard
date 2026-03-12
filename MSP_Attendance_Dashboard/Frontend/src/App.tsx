@@ -17,8 +17,8 @@ const App = () => {
             <AdminInterface />
           </ProtectedRoute>
         } />
-      </Routes>
-    </BrowserRouter>
+         </Routes>
+      </BrowserRouter>
   )
 }
 
